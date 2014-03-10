@@ -1,7 +1,10 @@
 package com.badlogic.gdx.input;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 
+import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 
@@ -63,7 +66,6 @@ public class InputState {
 	}
 
 	public void set(Input input) {
-		setAccelerometer(input);
 		setX(input);
 		setY(input);
 		setDeltaX(input);
@@ -73,13 +75,7 @@ public class InputState {
 		setPressedKeys(input);
 		setKeyEvents(input);
 		setTouchEvents(input);
-		setRotation(input);
-	}
-
-	private void setAccelerometer(Input input) {
-		accelerometerX = input.getAccelerometerX();
-		accelerometerY = input.getAccelerometerY();
-		accelerometerZ = input.getAccelerometerZ();
+		setOrientation(input);
 	}
 
 	private void setX(Input input) {
@@ -131,7 +127,43 @@ public class InputState {
 		EventBufferAccessHelper.copyTouchEvents(input, touchEvents);
 	}
 
-	private void setRotation(Input input) {
+	private void setOrientation(Input input) {
+		if (Gdx.app.getType() == ApplicationType.Android) {
+			while (input instanceof InputProxy) {
+				input = ((InputProxy) input).getProxiedInput();
+			}
+			try {
+				Class<?> inputClass = input.getClass();
+				if (Class.forName(
+						"com.badlogic.gdx.backends.android.AndroidInput")
+						.isAssignableFrom(inputClass)) {
+					Method updateOrientation = inputClass.getDeclaredMethod(
+							"updateOrientation", new Class<?>[0]);
+					updateOrientation.setAccessible(true);
+					updateOrientation.invoke(input, new Object[0]);
+				}
+			} catch (ClassNotFoundException e) {
+				throw new IllegalStateException(
+						"Android application without AndroidInput?");
+			} catch (NoSuchMethodException e) {
+				throw new IllegalStateException("No updateOrientation?");
+			} catch (SecurityException e) {
+				throw e;
+			} catch (IllegalAccessException e) {
+				throw new IllegalStateException(
+						"Running in a too restrictive environment...");
+			} catch (IllegalArgumentException e) {
+				throw e;
+			} catch (InvocationTargetException e) {
+				throw new IllegalStateException("updateOrientation:"
+						+ e.getLocalizedMessage());
+			}
+		}
+
+		accelerometerX = input.getAccelerometerX();
+		accelerometerY = input.getAccelerometerY();
+		accelerometerZ = input.getAccelerometerZ();
+
 		pitch = input.getPitch();
 		roll = input.getRoll();
 		azimuth = input.getAzimuth();

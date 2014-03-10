@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.ReflectionPool;
 
@@ -11,35 +13,18 @@ class InputStateTracker {
 
 	private final InputRecorder recorder;
 	private final Processor processor;
-	private Thread processorThread;
+
 	private List<InputState> bufferStates;
 	private List<InputState> processStates;
 	private final Pool<InputState> statePool;
 
 	private final InputStateGrabber grabber;
 	private final GrabberArmer grabberArmer;
-
-	private boolean running = false;
+	private final GrabberKeeper grabberKeeper;
 
 	private static final int STATES_UNTIL_PROCESS = 20;
 
-	public void startTracking() {
-		running = true;
-		if (processorThread.isAlive()) {
-			processorThread.interrupt();
-		}
-		processorThread = new Thread(processor);
-		processorThread.setDaemon(true);
-		processorThread.start();
-	}
-
-	public void stopTracking() {
-		running = false;
-	}
-
-	public boolean isTracking() {
-		return running;
-	}
+	private boolean tracking = false;
 
 	public InputStateTracker(InputRecorder inputRecorder) {
 		this.recorder = inputRecorder;
@@ -51,6 +36,37 @@ class InputStateTracker {
 
 		grabber = new InputStateGrabber();
 		grabberArmer = new GrabberArmer();
+		grabberKeeper = new GrabberKeeper();
+	}
+
+	public synchronized void startTracking() {
+		tracking = true;
+		stopTracking();
+
+		processor.start();
+		grabberKeeper.setProxiedInput(Gdx.input);
+		Gdx.input = grabberKeeper;
+		grabberArmer.start();
+	}
+
+	public synchronized void stopTracking() {
+		processor.stop();
+		grabberArmer.stop();
+		// TODO find way to remove grabberKeeper from within InputProxy
+		// hierarchy
+		if (Gdx.input == grabberKeeper) {
+			Gdx.input = grabberKeeper.getProxiedInput();
+		} else {
+			Gdx.app.log(InputRecorder.LOG_TAG,
+					"Cannot unregister GrabberKeeper");
+		}
+		// InputStateGrabber can be left as current InputProcessor since it
+		// won't be rearmed
+		tracking = false;
+	}
+
+	public synchronized boolean isTracking() {
+		return tracking;
 	}
 
 	private void track() {
@@ -81,11 +97,24 @@ class InputStateTracker {
 		processStates.clear();
 	}
 
-	private class InputStateGrabber extends InputProcessorProxy {
+	private class GrabberKeeper extends InputProxy {
+		@Override
+		public void setProxiedInput(Input proxied) {
+			super.setProxiedInput(proxied);
+			grabber.setProxied(proxied.getInputProcessor());
+			proxied.setInputProcessor(grabber);
+		}
 
+		@Override
+		public void setInputProcessor(InputProcessor processor) {
+			grabber.setProxied(processor);
+		}
+	}
+
+	private class InputStateGrabber extends InputProcessorProxy {
 		private boolean armed = false;
 
-		public void arm() {
+		public void rearm() {
 			armed = true;
 		}
 
@@ -96,13 +125,23 @@ class InputStateTracker {
 				track();
 			}
 		}
-
 	}
 
 	private class GrabberArmer implements Runnable {
+		private boolean running;
+
+		public void start() {
+			running = true;
+			run();
+		}
+
+		public void stop() {
+			running = false;
+		}
+
 		@Override
 		public void run() {
-			grabber.arm();
+			grabber.rearm();
 			if (running) {
 				Gdx.app.postRunnable(this);
 			}
@@ -110,6 +149,21 @@ class InputStateTracker {
 	}
 
 	private class Processor implements Runnable {
+		private Thread processorThread;
+
+		public synchronized void start() {
+			stop();
+			processorThread = new Thread(this);
+			processorThread.setDaemon(true);
+			processorThread.start();
+		}
+
+		public synchronized void stop() {
+			if (processorThread != null && processorThread.isAlive()) {
+				processorThread.interrupt();
+			}
+		}
+
 		@Override
 		public void run() {
 			while (!Thread.currentThread().isInterrupted()) {

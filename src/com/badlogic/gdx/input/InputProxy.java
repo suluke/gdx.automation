@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 
 class InputProxy implements Input {
 
-	private Input input;
+	protected Input input;
 
 	public InputProxy(Input proxied) {
 		testNullProxied(proxied);

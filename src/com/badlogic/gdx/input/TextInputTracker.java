@@ -39,7 +39,12 @@ class TextInputTracker extends InputProxy {
 	}
 
 	public synchronized void stopTracking() {
-		Gdx.input = getProxiedInput();
+		if (Gdx.input == this) {
+			Gdx.input = getProxiedInput();
+		} else {
+			Gdx.app.log(InputRecorder.LOG_TAG,
+					"Cannot unregister TextInputTracker");
+		}
 		running = false;
 	}
 
