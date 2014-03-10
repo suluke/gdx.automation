@@ -9,12 +9,16 @@ import com.badlogic.gdx.Input;
  */
 class TextInputTracker extends InputProxy {
 
+	private boolean running = false;
+
 	public TextInputTracker(InputRecorder inputTracker) {
 		super();
 	}
 
-	public void startTracking() {
+	public synchronized void startTracking() {
 		setProxiedInput(getTrackedInput());
+		Gdx.input = this;
+		running = true;
 	}
 
 	private Input getTrackedInput() {
@@ -34,8 +38,9 @@ class TextInputTracker extends InputProxy {
 		}
 	}
 
-	public void stopTracking() {
+	public synchronized void stopTracking() {
 		Gdx.input = getProxiedInput();
+		running = false;
 	}
 
 	@Override
@@ -82,5 +87,9 @@ class TextInputTracker extends InputProxy {
 			listener.canceled();
 		}
 
+	}
+
+	public boolean isTracking() {
+		return running;
 	}
 }

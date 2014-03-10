@@ -23,8 +23,8 @@ import com.badlogic.gdx.utils.IntMap.Keys;
  * 
  */
 class EventBufferAccessHelper {
-	private static final ArrayList<KeyEvent> keyEvents = new ArrayList<KeyEvent>();
-	private static final ArrayList<TouchEvent> touchEvents = new ArrayList<TouchEvent>();
+	static final ArrayList<KeyEvent> keyEvents = new ArrayList<KeyEvent>();
+	static final ArrayList<TouchEvent> touchEvents = new ArrayList<TouchEvent>();
 	private static final SparseArray<Boolean> pressedKeys = new SparseArray<Boolean>();
 
 	static enum KeyState {
@@ -105,10 +105,24 @@ class EventBufferAccessHelper {
 	}
 
 	public static List<KeyEvent> accessKeyEvents(Input input) {
-		if (input instanceof TextInputTracker) {
-			input = ((TextInputTracker) input).getProxiedInput();
+		return accessKeyEvents(input, true);
+	}
+
+	/**
+	 * 
+	 * @param input
+	 * @param update
+	 *            if LWJGL events should be pulled before accessing the events.
+	 *            This is necessary if you do not access the events between a
+	 *            call to {@link LwjglInput#update update} and the end of
+	 *            {@link LwjglInput#processEvents processEvents}
+	 * @return
+	 */
+	static List<KeyEvent> accessKeyEvents(Input input, boolean update) {
+		while (input instanceof InputProxy) {
+			input = ((InputProxy) input).getProxiedInput();
 		}
-		if (Gdx.app.getType() == ApplicationType.Desktop) {
+		if (update && Gdx.app.getType() == ApplicationType.Desktop) {
 			callMethod("updateKeyboard", input, null, null);
 		}
 		@SuppressWarnings("unchecked")
@@ -142,15 +156,29 @@ class EventBufferAccessHelper {
 	}
 
 	public static List<TouchEvent> accessTouchEvents(Input input) {
-		if (input instanceof TextInputTracker) {
-			input = ((TextInputTracker) input).getProxiedInput();
+		return accessTouchEvents(input, true);
+	}
+
+	/**
+	 * 
+	 * @param input
+	 * @param update
+	 *            if LWJGL events should be pulled before accessing the events.
+	 *            This is necessary if you do not access the events between a
+	 *            call to {@link LwjglInput#update update} and the end of
+	 *            {@link LwjglInput#processEvents processEvents}
+	 * @return
+	 */
+	static List<TouchEvent> accessTouchEvents(Input input, boolean update) {
+		while (input instanceof InputProxy) {
+			input = ((InputProxy) input).getProxiedInput();
+		}
+		if (update && Gdx.app.getType() == ApplicationType.Desktop) {
+			callMethod("updateMouse", input, null, null);
 		}
 		@SuppressWarnings("unchecked")
 		List<Object> inputTouchEvents = (List<Object>) accessField(
 				getField(input.getClass(), "touchEvents"), input);
-		if (Gdx.app.getType() == ApplicationType.Desktop) {
-			callMethod("updateMouse", input, null, null);
-		}
 		synchronized (touchEvents) {
 			touchEvents.clear();
 			for (Object event : inputTouchEvents) {
@@ -207,8 +235,8 @@ class EventBufferAccessHelper {
 
 	private static void copyPressedKeys(Input input) {
 		// TODO no actual input type check. Just assuming on app type
-		if (input instanceof TextInputTracker) {
-			input = ((TextInputTracker) input).getProxiedInput();
+		while (input instanceof InputProxy) {
+			input = ((InputProxy) input).getProxiedInput();
 		}
 		if (Gdx.app.getType() == ApplicationType.Android) {
 			@SuppressWarnings("unchecked")
@@ -234,8 +262,8 @@ class EventBufferAccessHelper {
 	}
 
 	private static Object getKeySynchronizer(Input input) {
-		if (input instanceof TextInputTracker) {
-			input = ((TextInputTracker) input).getProxiedInput();
+		while (input instanceof InputProxy) {
+			input = ((InputProxy) input).getProxiedInput();
 		}
 		Object synchronizer = null;
 		if (Gdx.app.getType() == ApplicationType.Android) {
