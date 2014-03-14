@@ -5,6 +5,18 @@ import com.badlogic.gdx.Input.Orientation;
 import com.badlogic.gdx.Input.Peripheral;
 
 public abstract class InputProperty {
+
+	public enum Types {
+		touchCoords(1), buttons(2), touchEvents(4), keyEvents(8), pressedKeys(
+				16), orientation(32);
+
+		int key;
+
+		private Types(int key) {
+			this.key = key;
+		}
+	}
+
 	public static class Accelerometer extends InputProperty {
 		public float x;
 		public float y;

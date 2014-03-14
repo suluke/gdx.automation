@@ -18,31 +18,37 @@ class InputStateTracker {
 	private List<InputState> processStates;
 	private final Pool<InputState> statePool;
 
-	private final InputStateGrabber grabber;
+	private final Tracker tracker;
+
+	private final InputEventGrabber grabber;
 	private final GrabberArmer grabberArmer;
 	private final GrabberKeeper grabberKeeper;
 
 	private static final int STATES_UNTIL_PROCESS = 20;
 
 	private boolean tracking = false;
+	InputState currentState;
 
 	public InputStateTracker(InputRecorder inputRecorder) {
 		this.recorder = inputRecorder;
+
 		bufferStates = new ArrayList<InputState>();
 		processStates = new ArrayList<InputState>();
 
 		statePool = new ReflectionPool<InputState>(InputState.class, 50);
 		processor = new Processor();
 
-		grabber = new InputStateGrabber();
+		tracker = new Tracker();
+
+		grabber = new InputEventGrabber();
 		grabberArmer = new GrabberArmer();
 		grabberKeeper = new GrabberKeeper();
 	}
 
 	public synchronized void startTracking() {
-		tracking = true;
 		stopTracking();
-
+		tracking = true;
+		tracker.start();
 		processor.start();
 		grabberKeeper.setProxiedInput(Gdx.input);
 		Gdx.input = grabberKeeper;
@@ -52,14 +58,11 @@ class InputStateTracker {
 	public synchronized void stopTracking() {
 		processor.stop();
 		grabberArmer.stop();
-		// TODO find way to remove grabberKeeper from within InputProxy
-		// hierarchy
-		if (Gdx.input == grabberKeeper) {
-			Gdx.input = grabberKeeper.getProxiedInput();
-		} else {
+		if (!InputProxy.removeProxyFromGdx(grabberKeeper)) {
 			Gdx.app.log(InputRecorder.LOG_TAG,
 					"Cannot unregister GrabberKeeper");
 		}
+		tracker.stop();
 		// InputStateGrabber can be left as current InputProcessor since it
 		// won't be rearmed
 		tracking = false;
@@ -72,9 +75,13 @@ class InputStateTracker {
 	private void track() {
 		synchronized (processor) {
 			synchronized (bufferStates) {
-				InputState state = statePool.obtain();
-				state.set(Gdx.input);
-				bufferStates.add(state);
+				currentState = statePool.obtain();
+				int toSet = InputProperty.Types.buttons.key
+						| InputProperty.Types.orientation.key
+						| InputProperty.Types.pressedKeys.key
+						| InputProperty.Types.touchCoords.key;
+				currentState.set(Gdx.input, toSet, false);
+				bufferStates.add(currentState);
 				if (bufferStates.size() >= STATES_UNTIL_PROCESS) {
 					processor.notify();
 				}
@@ -82,6 +89,11 @@ class InputStateTracker {
 		}
 	}
 
+	/**
+	 * Processes all the InputStates that were collected for some main loop
+	 * cycle in one run. That is, creating diffs and writing them using the
+	 * {@link InputRecorder}'s {@link InputRecordWriter}
+	 */
 	private void process() {
 		List<InputState> swap = bufferStates;
 		synchronized (bufferStates) {
@@ -97,6 +109,11 @@ class InputStateTracker {
 		processStates.clear();
 	}
 
+	/**
+	 * An input that will not allow the InputEventGrabber {@link InputProcessor}
+	 * to be overwritten via setInputProcessor
+	 * 
+	 */
 	private class GrabberKeeper extends InputProxy {
 		@Override
 		public void setProxiedInput(Input proxied) {
@@ -111,7 +128,13 @@ class InputStateTracker {
 		}
 	}
 
-	private class InputStateGrabber extends InputProcessorProxy {
+	/**
+	 * Pretends to be an InputProcessor to have one of its method called in
+	 * processEvents, the place right after the input event buffers are filled
+	 * and right before they are cleared.
+	 * 
+	 */
+	private class InputEventGrabber extends InputProcessorProxy {
 		private boolean armed = false;
 
 		public void rearm() {
@@ -122,11 +145,19 @@ class InputStateTracker {
 		protected synchronized void onEvent() {
 			if (armed) {
 				armed = false;
-				track();
+				int toSet = InputProperty.Types.keyEvents.key
+						| InputProperty.Types.touchEvents.key;
+				currentState.set(Gdx.input, toSet, false);
 			}
 		}
 	}
 
+	/**
+	 * A runnable on the main thread to make the InputEventGrabber listen to
+	 * events (arm it) just before the first event of the current main loop
+	 * cycle is being processed
+	 * 
+	 */
 	private class GrabberArmer implements Runnable {
 		private boolean running;
 
@@ -148,6 +179,11 @@ class InputStateTracker {
 		}
 	}
 
+	/**
+	 * A worker thread to process and write input state changes back without
+	 * blocking the main loop
+	 * 
+	 */
 	private class Processor implements Runnable {
 		private Thread processorThread;
 
@@ -178,5 +214,35 @@ class InputStateTracker {
 				process();
 			}
 		}
+	}
+
+	/**
+	 * Runnable to be posted on the main loop's thread to repeatedly call
+	 * {@link InputStateTracker#track() track()}
+	 * 
+	 */
+	private class Tracker implements Runnable {
+		private boolean running = false;
+
+		public synchronized void start() {
+			boolean wasRunning = running;
+			running = true;
+			if (!wasRunning) {
+				Gdx.app.postRunnable(this);
+			}
+		}
+
+		public synchronized void stop() {
+			running = false;
+		}
+
+		@Override
+		public void run() {
+			track();
+			if (running) {
+				Gdx.app.postRunnable(this);
+			}
+		}
+
 	}
 }

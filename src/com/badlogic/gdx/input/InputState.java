@@ -65,17 +65,38 @@ public class InputState {
 		touchEvents = new ArrayList<EventBufferAccessHelper.TouchEvent>();
 	}
 
-	public void set(Input input) {
-		setX(input);
-		setY(input);
-		setDeltaX(input);
-		setDeltaY(input);
-		setTouched(input);
-		setButtons(input);
-		setPressedKeys(input);
-		setKeyEvents(input);
-		setTouchEvents(input);
-		setOrientation(input);
+	/**
+	 * Use OR'ed {@link InputProperty.Types#key}s to define properties
+	 * 
+	 * @param input
+	 * @param properties
+	 * @param updateEvents
+	 *            whether to force-pull events from their backend-specific
+	 *            sources before copying them into this InputState.
+	 */
+	public void set(Input input, int properties, boolean updateEvents) {
+		if ((InputProperty.Types.touchCoords.key & properties) != 0) {
+			setX(input);
+			setY(input);
+			setDeltaX(input);
+			setDeltaY(input);
+			setTouched(input);
+		}
+		if ((InputProperty.Types.buttons.key & properties) != 0) {
+			setButtons(input);
+		}
+		if ((InputProperty.Types.pressedKeys.key & properties) != 0) {
+			setPressedKeys(input);
+		}
+		if ((InputProperty.Types.keyEvents.key & properties) != 0) {
+			setKeyEvents(input, updateEvents);
+		}
+		if ((InputProperty.Types.touchEvents.key & properties) != 0) {
+			setTouchEvents(input, updateEvents);
+		}
+		if ((InputProperty.Types.orientation.key & properties) != 0) {
+			setOrientation(input);
+		}
 	}
 
 	private void setX(Input input) {
@@ -119,12 +140,12 @@ public class InputState {
 		EventBufferAccessHelper.copyPressedKeys(input, pressedKeys);
 	}
 
-	private void setKeyEvents(Input input) {
-		EventBufferAccessHelper.copyKeyEvents(input, keyEvents);
+	private void setKeyEvents(Input input, boolean update) {
+		EventBufferAccessHelper.copyKeyEvents(input, keyEvents, update);
 	}
 
-	private void setTouchEvents(Input input) {
-		EventBufferAccessHelper.copyTouchEvents(input, touchEvents);
+	private void setTouchEvents(Input input, boolean update) {
+		EventBufferAccessHelper.copyTouchEvents(input, touchEvents, update);
 	}
 
 	private void setOrientation(Input input) {

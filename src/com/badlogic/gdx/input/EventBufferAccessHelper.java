@@ -207,17 +207,19 @@ class EventBufferAccessHelper {
 		return touchEvents;
 	}
 
-	public static void copyKeyEvents(Input input, List<KeyEvent> copyInto) {
+	public static void copyKeyEvents(Input input, List<KeyEvent> copyInto,
+			boolean update) {
 		copyInto.clear();
 		synchronized (keyEvents) {
-			Collections.copy(accessKeyEvents(input), copyInto);
+			Collections.copy(accessKeyEvents(input, update), copyInto);
 		}
 	}
 
-	public static void copyTouchEvents(Input input, List<TouchEvent> copyInto) {
+	public static void copyTouchEvents(Input input, List<TouchEvent> copyInto,
+			boolean update) {
 		copyInto.clear();
 		synchronized (touchEvents) {
-			Collections.copy(accessTouchEvents(input), copyInto);
+			Collections.copy(accessTouchEvents(input, update), copyInto);
 		}
 	}
 

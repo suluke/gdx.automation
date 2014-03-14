@@ -1,5 +1,6 @@
 package com.badlogic.gdx.input;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Pixmap;
@@ -226,4 +227,33 @@ class InputProxy implements Input {
 		input.setCursorImage(pixmap, xHotspot, yHotspot);
 	}
 
+	/**
+	 * Goes down the hierarchy of InputProxies, starting at Gdx.input and
+	 * removes the given InputProxy, if it exists. Returns if the given
+	 * {@link InputProxy} was found and removed.
+	 * 
+	 * @param proxy
+	 *            the proxy to be found and removed
+	 * @return true if the specified proxy was removed, false otherwise
+	 */
+	public static boolean removeProxyFromGdx(InputProxy proxy) {
+		if (Gdx.input == null) {
+			return false;
+		}
+		if (Gdx.input.equals(proxy)) {
+			Gdx.input = proxy.getProxiedInput();
+			return true;
+		}
+		Input current = Gdx.input;
+		InputProxy asProxy;
+		while (current != null && current instanceof InputProxy) {
+			asProxy = (InputProxy) current;
+			if (asProxy.getProxiedInput().equals(proxy)) {
+				asProxy.setProxiedInput(proxy.getProxiedInput());
+				return true;
+			}
+			current = asProxy.getProxiedInput();
+		}
+		return false;
+	}
 }
