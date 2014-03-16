@@ -1,6 +1,8 @@
 package com.badlogic.gdx.input;
 
-import com.badlogic.gdx.Input;
+import com.badlogic.gdx.input.InputValue.AsyncValue;
+import com.badlogic.gdx.input.InputValue.StaticValues;
+import com.badlogic.gdx.input.InputValue.SyncValue;
 
 public interface InputRecordWriter {
 
@@ -10,23 +12,9 @@ public interface InputRecordWriter {
 	 */
 	void flush();
 
-	/**
-	 * Adds a response to a
-	 * {@link Input#getTextInput(com.badlogic.gdx.Input.TextInputListener, String, String)
-	 * getTextInput} request to the response queue. If the given argument is
-	 * null, the request was canceled, which will also be recorded.
-	 * 
-	 * @param input
-	 */
-	void writeTextInput(String input);
+	void writeStaticValues(StaticValues values);
 
-	/**
-	 * Adds a response to a
-	 * {@link Input#getPlaceholderTextInput(com.badlogic.gdx.Input.TextInputListener, String, String)
-	 * getTextInput} request to the response queue. If the given argument is
-	 * null, the request was canceled, which will also be recorded.
-	 * 
-	 * @param input
-	 */
-	void writePlaceholderTextInput(String input);
+	void writeSyncValues(SyncValue values);
+
+	void writeAsyncValues(AsyncValue values);
 }

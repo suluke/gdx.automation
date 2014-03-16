@@ -2,6 +2,8 @@ package com.badlogic.gdx.input;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.input.InputValue.AsyncValue.PlaceholderText;
+import com.badlogic.gdx.input.InputValue.AsyncValue.Text;
 
 /**
  * 
@@ -63,19 +65,19 @@ class TextInputTracker extends InputProxy {
 	}
 
 	private void inputText(String text) {
-		recorder.getRecordWriter().writeTextInput(text);
+		recorder.getRecordWriter().writeAsyncValues(new Text(text));
 	}
 
 	private void canceledText() {
-		recorder.getRecordWriter().writeTextInput(null);
+		recorder.getRecordWriter().writeAsyncValues(new Text(null));
 	}
 
 	private void inputPlaceholderText(String text) {
-		recorder.getRecordWriter().writePlaceholderTextInput(text);
+		recorder.getRecordWriter().writeAsyncValues(new PlaceholderText(text));
 	}
 
 	private void canceledPlaceholderText() {
-		recorder.getRecordWriter().writePlaceholderTextInput(null);
+		recorder.getRecordWriter().writeAsyncValues(new PlaceholderText(null));
 	}
 
 	private enum TextType {

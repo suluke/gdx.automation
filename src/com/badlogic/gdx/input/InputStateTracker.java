@@ -35,16 +35,16 @@ class InputStateTracker {
 
 		int toSet = 0;
 		if (recorder.getConfiguration().recordButtonsPressed) {
-			toSet |= InputProperty.Types.buttons.key;
+			toSet |= InputValue.SyncValue.Types.buttons.key;
 		}
 		if (recorder.getConfiguration().recordDeviceOrientation) {
-			toSet |= InputProperty.Types.orientation.key;
+			toSet |= InputValue.SyncValue.Types.orientation.key;
 		}
 		if (recorder.getConfiguration().recordKeysPressed) {
-			toSet |= InputProperty.Types.pressedKeys.key;
+			toSet |= InputValue.SyncValue.Types.pressedKeys.key;
 		}
 		if (recorder.getConfiguration().recordCoordinates) {
-			toSet |= InputProperty.Types.touchCoords.key;
+			toSet |= InputValue.SyncValue.Types.touchCoords.key;
 		}
 		propertiesTrackFlags = toSet;
 
@@ -105,26 +105,6 @@ class InputStateTracker {
 	}
 
 	/**
-	 * Processes all the InputStates that were collected for some main loop
-	 * cycle in one run. That is, creating diffs and writing them using the
-	 * {@link InputRecorder}'s {@link InputRecordWriter}
-	 */
-	private void process() {
-		List<InputState> swap = bufferStates;
-		synchronized (bufferStates) {
-			bufferStates = processStates;
-		}
-		processStates = swap;
-		System.out.println("Now processing " + processStates.size()
-				+ " InputStates");
-		for (InputState state : processStates) {
-			// TODO
-			statePool.free(state);
-		}
-		processStates.clear();
-	}
-
-	/**
 	 * An input that will not allow the InputEventGrabber {@link InputProcessor}
 	 * to be overwritten via setInputProcessor
 	 * 
@@ -160,8 +140,8 @@ class InputStateTracker {
 		protected synchronized void onEvent() {
 			if (armed) {
 				armed = false;
-				int toSet = InputProperty.Types.keyEvents.key
-						| InputProperty.Types.touchEvents.key;
+				int toSet = InputValue.SyncValue.Types.touchEvents.key
+						| InputValue.SyncValue.Types.keyEvents.key;
 				currentState.set(Gdx.input, toSet, false);
 			}
 		}
@@ -201,6 +181,11 @@ class InputStateTracker {
 	 */
 	private class Processor implements Runnable {
 		private Thread processorThread;
+		private final InputStateProcessor processor;
+
+		public Processor() {
+			processor = new InputStateProcessor(recorder);
+		}
 
 		public synchronized void start() {
 			stop();
@@ -213,6 +198,26 @@ class InputStateTracker {
 			if (processorThread != null && processorThread.isAlive()) {
 				processorThread.interrupt();
 			}
+		}
+
+		/**
+		 * Processes all the InputStates that were collected for some main loop
+		 * cycle in one run. That is, creating diffs and writing them using the
+		 * {@link InputRecorder}'s {@link InputRecordWriter}
+		 */
+		private void process() {
+			List<InputState> swap = bufferStates;
+			synchronized (bufferStates) {
+				bufferStates = processStates;
+			}
+			processStates = swap;
+			Gdx.app.log(InputRecorder.LOG_TAG, "Now processing "
+					+ processStates.size() + " InputStates");
+			for (InputState state : processStates) {
+				processor.process(state);
+				statePool.free(state);
+			}
+			processStates.clear();
 		}
 
 		@Override

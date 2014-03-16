@@ -1,6 +1,9 @@
 package com.badlogic.gdx.input;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.input.InputValue.AsyncValue;
+import com.badlogic.gdx.input.InputValue.StaticValues;
+import com.badlogic.gdx.input.InputValue.SyncValue;
 
 public class SimpleInputRecordWriter implements InputRecordWriter {
 	public SimpleInputRecordWriter(FileHandle output) {
@@ -14,15 +17,20 @@ public class SimpleInputRecordWriter implements InputRecordWriter {
 	}
 
 	@Override
-	public void writeTextInput(String input) {
+	public void writeStaticValues(StaticValues values) {
 		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public void writePlaceholderTextInput(String input) {
+	public void writeSyncValues(SyncValue values) {
 		// TODO Auto-generated method stub
 
 	}
 
+	@Override
+	public void writeAsyncValues(AsyncValue values) {
+		// TODO Auto-generated method stub
+
+	}
 }

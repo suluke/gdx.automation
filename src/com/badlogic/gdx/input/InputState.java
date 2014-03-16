@@ -8,6 +8,7 @@ import java.util.Arrays;
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.utils.TimeUtils;
 
 public class InputState {
 
@@ -43,6 +44,8 @@ public class InputState {
 	public int orientation;
 
 	public boolean cursorCatched;
+
+	public long timeStamp;
 
 	public InputState() {
 		pressedKeys = new SparseArray<Boolean>();
@@ -92,7 +95,7 @@ public class InputState {
 	}
 
 	/**
-	 * Use OR'ed {@link InputProperty.Types#key}s to define properties
+	 * Use OR'ed {@link InputValue.Types#key}s to define properties
 	 * 
 	 * @param input
 	 * @param properties
@@ -101,26 +104,28 @@ public class InputState {
 	 *            sources before copying them into this InputState.
 	 */
 	public void set(Input input, int properties, boolean updateEvents) {
-		if ((InputProperty.Types.touchCoords.key & properties) != 0) {
+		timeStamp = TimeUtils.millis(); // input in milliseconds should be
+										// sufficient
+		if ((InputValue.SyncValue.Types.touchCoords.key & properties) != 0) {
 			setX(input);
 			setY(input);
 			setDeltaX(input);
 			setDeltaY(input);
 			setTouched(input);
 		}
-		if ((InputProperty.Types.buttons.key & properties) != 0) {
+		if ((InputValue.SyncValue.Types.buttons.key & properties) != 0) {
 			setButtons(input);
 		}
-		if ((InputProperty.Types.pressedKeys.key & properties) != 0) {
+		if ((InputValue.SyncValue.Types.pressedKeys.key & properties) != 0) {
 			setPressedKeys(input);
 		}
-		if ((InputProperty.Types.keyEvents.key & properties) != 0) {
+		if ((InputValue.SyncValue.Types.keyEvents.key & properties) != 0) {
 			setKeyEvents(input, updateEvents);
 		}
-		if ((InputProperty.Types.touchEvents.key & properties) != 0) {
+		if ((InputValue.SyncValue.Types.touchEvents.key & properties) != 0) {
 			setTouchEvents(input, updateEvents);
 		}
-		if ((InputProperty.Types.orientation.key & properties) != 0) {
+		if ((InputValue.SyncValue.Types.orientation.key & properties) != 0) {
 			setOrientation(input);
 		}
 	}
@@ -230,6 +235,10 @@ public class InputState {
 			throw new IllegalArgumentException("Did not expect more than "
 					+ MAX_POINTERS + " pointers");
 		}
+	}
+
+	public long getTimeStamp() {
+		return timeStamp;
 	}
 
 	public float getAccelerometerX() {

@@ -43,6 +43,7 @@ public class InputRecorder {
 	}
 
 	public void startRecording() {
+		writer.writeStaticValues(InputValue.getCurrentStaticValues());
 		textTracker.startTracking();
 		valueTracker.startTracking();
 	}
