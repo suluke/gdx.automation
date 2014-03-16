@@ -3,6 +3,7 @@ package com.badlogic.gdx.input;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
@@ -10,17 +11,17 @@ import com.badlogic.gdx.Input;
 
 public class InputState {
 
-	private final int MAX_POINTERS;
+	private int MAX_POINTERS;
 
 	public float accelerometerX;
 	public float accelerometerY;
 	public float accelerometerZ;
 
-	public final int[] x;
-	public final int[] y;
-	public final int[] deltaX;
-	public final int[] deltaY;
-	public final boolean[] touched;
+	public int[] x;
+	public int[] y;
+	public int[] deltaX;
+	public int[] deltaY;
+	public boolean[] touched;
 
 	public boolean justTouched;
 
@@ -44,10 +45,13 @@ public class InputState {
 	public boolean cursorCatched;
 
 	public InputState() {
-		this(3);
+		pressedKeys = new SparseArray<Boolean>();
+		keyEvents = new ArrayList<EventBufferAccessHelper.KeyEvent>();
+		touchEvents = new ArrayList<EventBufferAccessHelper.TouchEvent>();
 	}
 
 	public InputState(int maxPointers) {
+		this();
 		if (maxPointers > 20) {
 			Gdx.app.log(
 					InputRecorder.LOG_TAG,
@@ -60,9 +64,31 @@ public class InputState {
 		deltaX = new int[MAX_POINTERS];
 		deltaY = new int[MAX_POINTERS];
 		touched = new boolean[MAX_POINTERS];
-		pressedKeys = new SparseArray<Boolean>();
-		keyEvents = new ArrayList<EventBufferAccessHelper.KeyEvent>();
-		touchEvents = new ArrayList<EventBufferAccessHelper.TouchEvent>();
+	}
+
+	public void initialize(int maxPointers) {
+		if (maxPointers != MAX_POINTERS) {
+			if (maxPointers > MAX_POINTERS) {
+				if (maxPointers > 20) {
+					Gdx.app.log(
+							InputRecorder.LOG_TAG,
+							"Warning: Most of the libGDX backends only use 20 pointers internally. Trying to use "
+									+ maxPointers);
+				}
+				x = new int[maxPointers];
+				y = new int[maxPointers];
+				deltaX = new int[maxPointers];
+				deltaY = new int[maxPointers];
+				touched = new boolean[maxPointers];
+			} else {
+				Arrays.fill(x, 0);
+				Arrays.fill(y, 0);
+				Arrays.fill(deltaX, 0);
+				Arrays.fill(deltaY, 0);
+				Arrays.fill(touched, false);
+			}
+			MAX_POINTERS = maxPointers;
+		}
 	}
 
 	/**
@@ -326,4 +352,14 @@ public class InputState {
 		return cursorCatched;
 	}
 
+	/**
+	 * Returns the maximum number of pointers that were tracked by this
+	 * {@link InputState}. This should correspond to
+	 * {@link InputRecorderConfiguration#recordedPointerCount}
+	 * 
+	 * @return the maximum number of pointers stored
+	 */
+	public int getPointerCount() {
+		return MAX_POINTERS;
+	}
 }

@@ -1,6 +1,11 @@
 package com.badlogic.gdx.input;
 
+import com.badlogic.gdx.files.FileHandle;
+
 public class SimpleInputRecordWriter implements InputRecordWriter {
+	public SimpleInputRecordWriter(FileHandle output) {
+
+	}
 
 	@Override
 	public void flush() {

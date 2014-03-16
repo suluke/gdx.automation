@@ -23,6 +23,7 @@ class InputStateTracker {
 	private final InputEventGrabber grabber;
 	private final GrabberArmer grabberArmer;
 	private final GrabberKeeper grabberKeeper;
+	private final int propertiesTrackFlags;
 
 	private static final int STATES_UNTIL_PROCESS = 20;
 
@@ -31,6 +32,21 @@ class InputStateTracker {
 
 	public InputStateTracker(InputRecorder inputRecorder) {
 		this.recorder = inputRecorder;
+
+		int toSet = 0;
+		if (recorder.getConfiguration().recordButtonsPressed) {
+			toSet |= InputProperty.Types.buttons.key;
+		}
+		if (recorder.getConfiguration().recordDeviceOrientation) {
+			toSet |= InputProperty.Types.orientation.key;
+		}
+		if (recorder.getConfiguration().recordKeysPressed) {
+			toSet |= InputProperty.Types.pressedKeys.key;
+		}
+		if (recorder.getConfiguration().recordCoordinates) {
+			toSet |= InputProperty.Types.touchCoords.key;
+		}
+		propertiesTrackFlags = toSet;
 
 		bufferStates = new ArrayList<InputState>();
 		processStates = new ArrayList<InputState>();
@@ -76,11 +92,10 @@ class InputStateTracker {
 		synchronized (processor) {
 			synchronized (bufferStates) {
 				currentState = statePool.obtain();
-				int toSet = InputProperty.Types.buttons.key
-						| InputProperty.Types.orientation.key
-						| InputProperty.Types.pressedKeys.key
-						| InputProperty.Types.touchCoords.key;
-				currentState.set(Gdx.input, toSet, false);
+				currentState
+						.initialize(recorder.getConfiguration().recordedPointerCount);
+
+				currentState.set(Gdx.input, propertiesTrackFlags, false);
 				bufferStates.add(currentState);
 				if (bufferStates.size() >= STATES_UNTIL_PROCESS) {
 					processor.notify();

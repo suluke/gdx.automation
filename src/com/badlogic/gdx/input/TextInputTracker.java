@@ -10,9 +10,11 @@ import com.badlogic.gdx.Input;
 class TextInputTracker extends InputProxy {
 
 	private boolean running = false;
+	private final InputRecorder recorder;
 
-	public TextInputTracker(InputRecorder inputTracker) {
+	public TextInputTracker(InputRecorder recorder) {
 		super();
+		this.recorder = recorder;
 	}
 
 	public synchronized void startTracking() {
@@ -49,44 +51,63 @@ class TextInputTracker extends InputProxy {
 	@Override
 	public void getTextInput(TextInputListener listener, String title,
 			String text) {
-		super.getTextInput(new TextInputListenerProxy(listener), title, text);
+		super.getTextInput(new TextInputListenerProxy(listener, TextType.TEXT),
+				title, text);
 	}
 
 	@Override
 	public void getPlaceholderTextInput(TextInputListener listener,
 			String title, String placeholder) {
-		super.getPlaceholderTextInput(new TextInputListenerProxy(listener),
-				title, placeholder);
+		super.getPlaceholderTextInput(new TextInputListenerProxy(listener,
+				TextType.PLACEHOLDER_TEXT), title, placeholder);
 	}
 
-	private void input(String text) {
-		// TODO Auto-generated method stub
-		// Implement
-
+	private void inputText(String text) {
+		recorder.getRecordWriter().writeTextInput(text);
 	}
 
-	private void canceled() {
-		// TODO Auto-generated method stub
+	private void canceledText() {
+		recorder.getRecordWriter().writeTextInput(null);
+	}
 
+	private void inputPlaceholderText(String text) {
+		recorder.getRecordWriter().writePlaceholderTextInput(text);
+	}
+
+	private void canceledPlaceholderText() {
+		recorder.getRecordWriter().writePlaceholderTextInput(null);
+	}
+
+	private enum TextType {
+		TEXT, PLACEHOLDER_TEXT
 	}
 
 	private class TextInputListenerProxy implements TextInputListener {
-
 		private final TextInputListener listener;
+		private final TextType type;
 
-		public TextInputListenerProxy(TextInputListener proxied) {
+		public TextInputListenerProxy(TextInputListener proxied, TextType type) {
 			listener = proxied;
+			this.type = type;
 		}
 
 		@Override
 		public void input(String text) {
-			TextInputTracker.this.input(text);
+			if (type == TextType.TEXT) {
+				TextInputTracker.this.inputText(text);
+			} else {
+				TextInputTracker.this.inputPlaceholderText(text);
+			}
 			listener.input(text);
 		}
 
 		@Override
 		public void canceled() {
-			TextInputTracker.this.canceled();
+			if (type == TextType.TEXT) {
+				TextInputTracker.this.canceledText();
+			} else {
+				TextInputTracker.this.canceledPlaceholderText();
+			}
 			listener.canceled();
 		}
 

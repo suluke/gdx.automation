@@ -4,7 +4,17 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Orientation;
 import com.badlogic.gdx.Input.Peripheral;
 
+/**
+ * Parent class of all (groups of) properties that make up an {@link InputState}
+ * . Since all properties are merely aggregations of primitives (you would call
+ * them "structs" in C) they are not declared in their own files but as inner
+ * classes of this class.
+ * 
+ */
 public abstract class InputProperty {
+	private InputProperty() {
+
+	}
 
 	public enum Types {
 		touchCoords(1), buttons(2), touchEvents(4), keyEvents(8), pressedKeys(

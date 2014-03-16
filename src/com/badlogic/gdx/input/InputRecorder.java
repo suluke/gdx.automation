@@ -1,12 +1,22 @@
 package com.badlogic.gdx.input;
 
+import com.badlogic.gdx.Files.FileType;
+import com.badlogic.gdx.Gdx;
+
+/**
+ * The main class for input recording in a libGDX application.
+ * 
+ */
 public class InputRecorder {
 
 	private final InputStateTracker valueTracker;
 	private final TextInputTracker textTracker;
-	InputRecordWriter writer;
+	private InputRecordWriter writer;
 
-	final InputRecorderConfiguration config;
+	private final InputRecorderConfiguration config;
+
+	private final static FileType standardOutputLocation = FileType.Local;
+	private final static String standardOutputPath = "gdxInputRecording.json";
 
 	final static String LOG_TAG = "InputTracker";
 
@@ -15,10 +25,21 @@ public class InputRecorder {
 	}
 
 	public InputRecorder(InputRecorderConfiguration config) {
-		this.config = config;
-
+		this.config = new InputRecorderConfiguration();
 		valueTracker = new InputStateTracker(this);
 		textTracker = new TextInputTracker(this);
+		init(config);
+	}
+
+	private void init(InputRecorderConfiguration newConfig) {
+		config.set(newConfig);
+		if (config.writer == null) {
+			if (config.outputFile == null) {
+				config.outputFile = Gdx.files.getFileHandle(standardOutputPath,
+						standardOutputLocation);
+			}
+			writer = new SimpleInputRecordWriter(config.outputFile);
+		}
 	}
 
 	public void startRecording() {
@@ -42,8 +63,10 @@ public class InputRecorder {
 		textTracker.stopTracking();
 		valueTracker.stopTracking();
 
-		writer.flush();
-		this.writer = writer;
+		synchronized (this.writer) {
+			flush();
+			this.writer = writer;
+		}
 
 		if (textTrackerRunning) {
 			textTracker.startTracking();
@@ -51,5 +74,15 @@ public class InputRecorder {
 		if (stateTrackerRunning) {
 			valueTracker.startTracking();
 		}
+	}
+
+	InputRecordWriter getRecordWriter() {
+		synchronized (writer) {
+			return writer;
+		}
+	}
+
+	InputRecorderConfiguration getConfiguration() {
+		return config;
 	}
 }
