@@ -24,6 +24,14 @@ class InputStateProcessor {
 
 	}
 
+	private void processPointers(InputState state) {
+
+	}
+
+	private void processButtons(InputState state) {
+
+	}
+
 	public void reset() {
 		lastState = null;
 	}

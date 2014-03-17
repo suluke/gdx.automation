@@ -26,9 +26,10 @@ public class InputRecorder {
 
 	public InputRecorder(InputRecorderConfiguration config) {
 		this.config = new InputRecorderConfiguration();
+		init(config);
+
 		valueTracker = new InputStateTracker(this);
 		textTracker = new TextInputTracker(this);
-		init(config);
 	}
 
 	private void init(InputRecorderConfiguration newConfig) {

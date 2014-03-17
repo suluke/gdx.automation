@@ -25,12 +25,12 @@ public class InputRecorderConfiguration {
 	/**
 	 * 
 	 */
-	public boolean recordButtonsPressed = true;
+	public boolean recordButtons = true;
 
 	/**
 	 * 
 	 */
-	public boolean recordCoordinates = true;
+	public boolean recordPointers = true;
 
 	/**
 	 * 
@@ -48,6 +48,16 @@ public class InputRecorderConfiguration {
 	public boolean recordKeysPressed = false;
 
 	/**
+	 * 
+	 */
+	public boolean recordTouchEvents = true;
+
+	/**
+	 * 
+	 */
+	public boolean recordKeyEvents = true;
+
+	/**
 	 * The default value is null, meaning that the {@link InputRecorder} will
 	 * create a default {@link InputRecordWriter} (a
 	 * {@link SimpleInputRecordWriter})
@@ -61,11 +71,13 @@ public class InputRecorderConfiguration {
 	public InputRecorderConfiguration set(InputRecorderConfiguration original) {
 		InputRecorderConfiguration copy = this;
 		copy.recordAccelerometer = original.recordAccelerometer;
-		copy.recordButtonsPressed = original.recordButtonsPressed;
-		copy.recordCoordinates = original.recordCoordinates;
+		copy.recordButtons = original.recordButtons;
 		copy.recordDeviceOrientation = original.recordDeviceOrientation;
-		copy.recordedPointerCount = original.recordedPointerCount;
+		copy.recordKeyEvents = original.recordKeyEvents;
 		copy.recordKeysPressed = original.recordKeysPressed;
+		copy.recordPointers = original.recordPointers;
+		copy.recordedPointerCount = original.recordedPointerCount;
+		copy.recordTouchEvents = original.recordTouchEvents;
 		copy.absoluteCoords = original.absoluteCoords;
 		copy.outputFile = original.outputFile;
 		copy.writer = original.writer;

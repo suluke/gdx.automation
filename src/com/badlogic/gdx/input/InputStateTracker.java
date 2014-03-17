@@ -23,7 +23,8 @@ class InputStateTracker {
 	private final InputEventGrabber grabber;
 	private final GrabberArmer grabberArmer;
 	private final GrabberKeeper grabberKeeper;
-	private final int propertiesTrackFlags;
+	private final int valuesTrackFlags;
+	private final int buffersTrackFlag;
 
 	private static final int STATES_UNTIL_PROCESS = 20;
 
@@ -34,7 +35,7 @@ class InputStateTracker {
 		this.recorder = inputRecorder;
 
 		int toSet = 0;
-		if (recorder.getConfiguration().recordButtonsPressed) {
+		if (recorder.getConfiguration().recordButtons) {
 			toSet |= InputValue.SyncValue.Types.buttons.key;
 		}
 		if (recorder.getConfiguration().recordDeviceOrientation) {
@@ -43,10 +44,19 @@ class InputStateTracker {
 		if (recorder.getConfiguration().recordKeysPressed) {
 			toSet |= InputValue.SyncValue.Types.pressedKeys.key;
 		}
-		if (recorder.getConfiguration().recordCoordinates) {
+		if (recorder.getConfiguration().recordPointers) {
 			toSet |= InputValue.SyncValue.Types.touchCoords.key;
 		}
-		propertiesTrackFlags = toSet;
+		valuesTrackFlags = toSet;
+
+		toSet = 0;
+		if (recorder.getConfiguration().recordKeyEvents) {
+			toSet |= InputValue.SyncValue.Types.keyEvents.key;
+		}
+		if (recorder.getConfiguration().recordTouchEvents) {
+			toSet |= InputValue.SyncValue.Types.touchEvents.key;
+		}
+		buffersTrackFlag = toSet;
 
 		bufferStates = new ArrayList<InputState>();
 		processStates = new ArrayList<InputState>();
@@ -95,7 +105,7 @@ class InputStateTracker {
 				currentState
 						.initialize(recorder.getConfiguration().recordedPointerCount);
 
-				currentState.set(Gdx.input, propertiesTrackFlags, false);
+				currentState.set(Gdx.input, valuesTrackFlags, false);
 				bufferStates.add(currentState);
 				if (bufferStates.size() >= STATES_UNTIL_PROCESS) {
 					processor.notify();
@@ -140,9 +150,7 @@ class InputStateTracker {
 		protected synchronized void onEvent() {
 			if (armed) {
 				armed = false;
-				int toSet = InputValue.SyncValue.Types.touchEvents.key
-						| InputValue.SyncValue.Types.keyEvents.key;
-				currentState.set(Gdx.input, toSet, false);
+				currentState.set(Gdx.input, buffersTrackFlag, false);
 			}
 		}
 	}
