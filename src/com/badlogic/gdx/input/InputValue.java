@@ -3,6 +3,8 @@ package com.badlogic.gdx.input;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Orientation;
 import com.badlogic.gdx.Input.Peripheral;
+import com.badlogic.gdx.input.InputValue.SyncValue.Button;
+import com.badlogic.gdx.input.InputValue.SyncValue.Pointer;
 
 /**
  * Parent class of all (groups of) properties that make up an {@link InputState}
@@ -15,7 +17,7 @@ public abstract class InputValue {
 	private InputValue() {
 	}
 
-	public static class SyncValue {
+	public static abstract class SyncValue {
 		public enum Types {
 			POINTERS(1), BUTTONS(2), TOUCH_EVENTS(4), KEY_EVENTS(8), KEYS_PRESSED(
 					16), ORIENTATION(32);
@@ -27,33 +29,59 @@ public abstract class InputValue {
 			}
 		}
 
+		public abstract void accept(SyncValueVisitor visitor);
+
 		/**
 		 * Milliseconds passed since the last {@link InputValue} changed
 		 */
 		public long timeDelta;
 
-		public static class Accelerometer extends SyncValue {
-			public float x;
-			public float y;
-			public float z;
+		public static class Orientation extends SyncValue {
+			public float accelerometerX;
+			public float accelerometerY;
+			public float accelerometerZ;
+
+			@Override
+			public void accept(SyncValueVisitor visitor) {
+				visitor.visitOrientation(this);
+			}
 		}
 
-		public static class TouchPosition extends SyncValue {
+		public static class Pointer extends SyncValue {
 			public int pointer;
 			public int x;
 			public int y;
 			public int deltaX;
 			public int deltaY;
+
+			@Override
+			public void accept(SyncValueVisitor visitor) {
+				visitor.visitPointer(this);
+			}
 		}
 
-		public static class MouseButton extends SyncValue {
+		public static class Button extends SyncValue {
 			public boolean button0;
 			public boolean button1;
 			public boolean button2;
+
+			@Override
+			public void accept(SyncValueVisitor visitor) {
+				visitor.visitButton(this);
+			}
 		}
 	}
 
-	public static class AsyncValue {
+	public interface SyncValueVisitor {
+		void visitOrientation(
+				com.badlogic.gdx.input.InputValue.SyncValue.Orientation orientation);
+
+		void visitPointer(Pointer pointer);
+
+		void visitButton(Button button);
+	}
+
+	public static abstract class AsyncValue {
 		public static class Text extends AsyncValue {
 			public Text(String text) {
 				input = text;
