@@ -3,6 +3,8 @@ package com.badlogic.gdx.input;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Orientation;
 import com.badlogic.gdx.Input.Peripheral;
+import com.badlogic.gdx.input.InputValue.AsyncValue.PlaceholderText;
+import com.badlogic.gdx.input.InputValue.AsyncValue.Text;
 import com.badlogic.gdx.input.InputValue.SyncValue.Button;
 import com.badlogic.gdx.input.InputValue.SyncValue.Pointer;
 
@@ -72,7 +74,7 @@ public abstract class InputValue {
 		}
 	}
 
-	public interface SyncValueVisitor {
+	public static interface SyncValueVisitor {
 		void visitOrientation(
 				com.badlogic.gdx.input.InputValue.SyncValue.Orientation orientation);
 
@@ -82,6 +84,8 @@ public abstract class InputValue {
 	}
 
 	public static abstract class AsyncValue {
+		public abstract void accept(AsyncValueVisitor visitor);
+
 		public static class Text extends AsyncValue {
 			public Text(String text) {
 				input = text;
@@ -92,6 +96,11 @@ public abstract class InputValue {
 			}
 
 			String input;
+
+			@Override
+			public void accept(AsyncValueVisitor visitor) {
+				visitor.visitText(this);
+			}
 		}
 
 		public static class PlaceholderText extends AsyncValue {
@@ -104,7 +113,18 @@ public abstract class InputValue {
 			}
 
 			String input;
+
+			@Override
+			public void accept(AsyncValueVisitor visitor) {
+				visitor.visitPlaceholderText(this);
+			}
 		}
+	}
+
+	public static interface AsyncValueVisitor {
+		void visitText(Text text);
+
+		void visitPlaceholderText(PlaceholderText text);
 	}
 
 	public static class StaticValues extends InputValue {
