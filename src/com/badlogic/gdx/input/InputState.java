@@ -106,26 +106,26 @@ public class InputState {
 	public void set(Input input, int properties, boolean updateEvents) {
 		timeStamp = TimeUtils.millis(); // input in milliseconds should be
 										// sufficient
-		if ((InputValue.SyncValue.Types.touchCoords.key & properties) != 0) {
+		if ((InputValue.SyncValue.Types.POINTERS.key & properties) != 0) {
 			setX(input);
 			setY(input);
 			setDeltaX(input);
 			setDeltaY(input);
 			setTouched(input);
 		}
-		if ((InputValue.SyncValue.Types.buttons.key & properties) != 0) {
+		if ((InputValue.SyncValue.Types.BUTTONS.key & properties) != 0) {
 			setButtons(input);
 		}
-		if ((InputValue.SyncValue.Types.pressedKeys.key & properties) != 0) {
+		if ((InputValue.SyncValue.Types.KEYS_PRESSED.key & properties) != 0) {
 			setPressedKeys(input);
 		}
-		if ((InputValue.SyncValue.Types.keyEvents.key & properties) != 0) {
+		if ((InputValue.SyncValue.Types.KEY_EVENTS.key & properties) != 0) {
 			setKeyEvents(input, updateEvents);
 		}
-		if ((InputValue.SyncValue.Types.touchEvents.key & properties) != 0) {
+		if ((InputValue.SyncValue.Types.TOUCH_EVENTS.key & properties) != 0) {
 			setTouchEvents(input, updateEvents);
 		}
-		if ((InputValue.SyncValue.Types.orientation.key & properties) != 0) {
+		if ((InputValue.SyncValue.Types.ORIENTATION.key & properties) != 0) {
 			setOrientation(input);
 		}
 	}

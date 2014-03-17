@@ -20,11 +20,6 @@ public class InputRecorderConfiguration {
 	/**
 	 * 
 	 */
-	public boolean recordAccelerometer = false;
-
-	/**
-	 * 
-	 */
 	public boolean recordButtons = true;
 
 	/**
@@ -35,7 +30,7 @@ public class InputRecorderConfiguration {
 	/**
 	 * 
 	 */
-	public boolean recordDeviceOrientation = false;
+	public boolean recordOrientation = false;
 
 	/**
 	 * 
@@ -70,9 +65,8 @@ public class InputRecorderConfiguration {
 
 	public InputRecorderConfiguration set(InputRecorderConfiguration original) {
 		InputRecorderConfiguration copy = this;
-		copy.recordAccelerometer = original.recordAccelerometer;
 		copy.recordButtons = original.recordButtons;
-		copy.recordDeviceOrientation = original.recordDeviceOrientation;
+		copy.recordOrientation = original.recordOrientation;
 		copy.recordKeyEvents = original.recordKeyEvents;
 		copy.recordKeysPressed = original.recordKeysPressed;
 		copy.recordPointers = original.recordPointers;

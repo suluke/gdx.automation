@@ -36,25 +36,25 @@ class InputStateTracker {
 
 		int toSet = 0;
 		if (recorder.getConfiguration().recordButtons) {
-			toSet |= InputValue.SyncValue.Types.buttons.key;
+			toSet |= InputValue.SyncValue.Types.BUTTONS.key;
 		}
-		if (recorder.getConfiguration().recordDeviceOrientation) {
-			toSet |= InputValue.SyncValue.Types.orientation.key;
+		if (recorder.getConfiguration().recordOrientation) {
+			toSet |= InputValue.SyncValue.Types.ORIENTATION.key;
 		}
 		if (recorder.getConfiguration().recordKeysPressed) {
-			toSet |= InputValue.SyncValue.Types.pressedKeys.key;
+			toSet |= InputValue.SyncValue.Types.KEYS_PRESSED.key;
 		}
 		if (recorder.getConfiguration().recordPointers) {
-			toSet |= InputValue.SyncValue.Types.touchCoords.key;
+			toSet |= InputValue.SyncValue.Types.POINTERS.key;
 		}
 		valuesTrackFlags = toSet;
 
 		toSet = 0;
 		if (recorder.getConfiguration().recordKeyEvents) {
-			toSet |= InputValue.SyncValue.Types.keyEvents.key;
+			toSet |= InputValue.SyncValue.Types.KEY_EVENTS.key;
 		}
 		if (recorder.getConfiguration().recordTouchEvents) {
-			toSet |= InputValue.SyncValue.Types.touchEvents.key;
+			toSet |= InputValue.SyncValue.Types.TOUCH_EVENTS.key;
 		}
 		buffersTrackFlag = toSet;
 

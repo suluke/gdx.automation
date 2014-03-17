@@ -17,8 +17,8 @@ public abstract class InputValue {
 
 	public static class SyncValue {
 		public enum Types {
-			touchCoords(1), buttons(2), touchEvents(4), keyEvents(8), pressedKeys(
-					16), orientation(32);
+			POINTERS(1), BUTTONS(2), TOUCH_EVENTS(4), KEY_EVENTS(8), KEYS_PRESSED(
+					16), ORIENTATION(32);
 
 			int key;
 
