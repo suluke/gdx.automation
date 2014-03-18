@@ -84,13 +84,9 @@ class InputStateTracker {
 	public synchronized void stopTracking() {
 		processor.stop();
 		grabberArmer.stop();
-		if (!InputProxy.removeProxyFromGdx(grabberKeeper)) {
-			Gdx.app.log(InputRecorder.LOG_TAG,
-					"Cannot unregister GrabberKeeper");
-		}
 		tracker.stop();
-		// InputStateGrabber can be left as current InputProcessor since it
-		// won't be rearmed
+		InputProxy.removeProxyFromGdx(grabberKeeper);
+		InputProcessorProxy.removeProxyFromGdxInput(grabber);
 		tracking = false;
 	}
 

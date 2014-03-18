@@ -65,7 +65,8 @@ class InputStateProcessor {
 			processTouchEvents(state);
 		}
 		if (lastState == null) {
-			lastState = new InputState();
+			lastState = new InputState(
+					recorder.getConfiguration().recordedPointerCount);
 		}
 		lastState.set(state, trackedValuesFlag);
 	}
