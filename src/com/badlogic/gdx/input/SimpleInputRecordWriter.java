@@ -57,7 +57,7 @@ public class SimpleInputRecordWriter implements InputRecordWriter {
 
 		@Override
 		public void visitPointerEvent(PointerEvent pointerEvent) {
-			System.out.println("MOUSE");
+			// System.out.println("MOUSE");
 		}
 
 		@Override

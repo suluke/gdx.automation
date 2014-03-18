@@ -201,6 +201,7 @@ class EventBufferAccessHelper {
 					e.type = PointerState.mapAndroid((Integer) accessField(
 							getField(event.getClass(), "type"), event));
 				}
+				pointerEvents.add(e);
 			}
 		}
 		return pointerEvents;
