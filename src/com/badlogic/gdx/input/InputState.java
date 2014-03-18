@@ -8,6 +8,7 @@ import java.util.Arrays;
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.input.InputValue.SyncValue.Types;
 import com.badlogic.gdx.utils.TimeUtils;
 
 public class InputState {
@@ -91,6 +92,42 @@ public class InputState {
 				Arrays.fill(touched, false);
 			}
 			MAX_POINTERS = maxPointers;
+		}
+	}
+
+	public void set(InputState state, int copyFlags) {
+		if ((copyFlags & Types.BUTTONS.key) != 0) {
+			button0 = state.button0;
+			button1 = state.button1;
+			button2 = state.button2;
+			cursorCatched = state.cursorCatched;
+		}
+		if ((copyFlags & Types.KEY_EVENTS.key) != 0) {
+
+		}
+		if ((copyFlags & Types.KEYS_PRESSED.key) != 0) {
+
+		}
+		if ((copyFlags & Types.ORIENTATION.key) != 0) {
+			accelerometerX = state.accelerometerX;
+			accelerometerY = state.accelerometerY;
+			accelerometerZ = state.accelerometerZ;
+			pitch = state.pitch;
+			roll = state.roll;
+			azimuth = state.azimuth;
+			orientation = state.orientation;
+			System.arraycopy(state.rotationMatrix, 0, rotationMatrix, 0, 16);
+		}
+		if ((copyFlags & Types.POINTERS.key) != 0) {
+			System.arraycopy(state.x, 0, x, 0, MAX_POINTERS);
+			System.arraycopy(state.y, 0, y, 0, MAX_POINTERS);
+			System.arraycopy(state.deltaX, 0, deltaX, 0, MAX_POINTERS);
+			System.arraycopy(state.deltaY, 0, deltaY, 0, MAX_POINTERS);
+			System.arraycopy(state.touched, 0, touched, 0, MAX_POINTERS);
+			justTouched = state.cursorCatched;
+		}
+		if ((copyFlags & Types.TOUCH_EVENTS.key) != 0) {
+
 		}
 	}
 

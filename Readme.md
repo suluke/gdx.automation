@@ -12,6 +12,30 @@ This is the result.
 I hope, there are people out there who find it useful.
 Below I explain what can already be achieved with the project, and in the "Future development" section you will find additional ideas on what could be made possible.
 
+## How to use
+### Recording
+```java
+public static void main(String[] args) { // or onCreate on Android
+	// initialize your app first...
+	InputRecorderConfiguration inputConfig = new InputRecorderConfiguration();
+	// maybe alter the configuration
+	// create and set a custom InputRecordWriter
+	InputRecorder recorder = new InputRecorder(inputConfig);
+	recorder.startRecording();
+}
+```
+### Playback
+This is not yet implemented
+```java
+public T myMethod(...) { // wherever you want to playback
+	// create and alter a PlayerConfiguration
+	// set the input file and configure the cool features of the player
+	// create and set a custom InputRecordReader
+	InputRecordPlayer player = new InputRecordPlayer();
+	player.startPlayback();
+}
+```
+
 ## Currently working
 * tested on desktop, code written to also support android (not tested)
 * recorded input legible for both poll- and event-based applications

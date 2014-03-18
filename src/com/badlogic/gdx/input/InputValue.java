@@ -66,6 +66,7 @@ public abstract class InputValue {
 			public boolean button0;
 			public boolean button1;
 			public boolean button2;
+			public boolean cursorCatched;
 
 			@Override
 			public void accept(SyncValueVisitor visitor) {

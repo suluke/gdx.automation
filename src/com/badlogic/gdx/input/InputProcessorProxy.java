@@ -1,8 +1,9 @@
 package com.badlogic.gdx.input;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 
-public class InputProcessorProxy implements InputProcessor {
+abstract class InputProcessorProxy implements InputProcessor {
 
 	private InputProcessor proxied;
 
@@ -103,4 +104,27 @@ public class InputProcessorProxy implements InputProcessor {
 
 	}
 
+	public static boolean removeProxyFromGdxInput(InputProcessorProxy proxy) {
+		if (Gdx.input == null) {
+			return false;
+		}
+		if (Gdx.input.getInputProcessor() == null) {
+			return false;
+		}
+		if (Gdx.input.getInputProcessor().equals(proxy)) {
+			Gdx.input.setInputProcessor(proxy.getProxied());
+			return true;
+		}
+		InputProcessor current = Gdx.input.getInputProcessor();
+		InputProcessorProxy asProxy;
+		while (current != null && current instanceof InputProcessorProxy) {
+			asProxy = (InputProcessorProxy) current;
+			if (asProxy.getProxied().equals(proxy)) {
+				asProxy.setProxied(proxy.getProxied());
+				return true;
+			}
+			current = asProxy.getProxied();
+		}
+		return false;
+	}
 }
