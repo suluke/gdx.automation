@@ -72,7 +72,7 @@ public class SimpleInputRecordWriter implements InputRecordWriter {
 
 		@Override
 		public void visitPointer(Pointer pointer) {
-			System.out.println("MOVED");
+			// System.out.println("MOVED");
 		}
 
 		@Override

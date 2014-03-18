@@ -5,7 +5,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import com.badlogic.gdx.Application.ApplicationType;
@@ -211,7 +210,7 @@ class EventBufferAccessHelper {
 			boolean update) {
 		copyInto.clear();
 		synchronized (keyEvents) {
-			Collections.copy(accessKeyEvents(input, update), copyInto);
+			copyInto.addAll(accessKeyEvents(input, update));
 		}
 	}
 
@@ -219,7 +218,7 @@ class EventBufferAccessHelper {
 			List<PointerEvent> copyInto, boolean update) {
 		copyInto.clear();
 		synchronized (pointerEvents) {
-			Collections.copy(accessPointerEvents(input, update), copyInto);
+			copyInto.addAll(accessPointerEvents(input, update));
 		}
 	}
 
