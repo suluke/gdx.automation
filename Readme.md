@@ -1,4 +1,4 @@
-# Input recorder and playback for libGdx
+# Input recorder and playback for libGDX
 ## Introduction
 For the last project I was involved in, our team was supposed to drive the test coverage as high as possible.
 We had based it on libGDX, which is great, but with its scene2d.ui package renders most of the GUI tools out there unusable.
@@ -47,6 +47,19 @@ public T myMethod(...) { // wherever you want to playback
   * specify which input states you are interested in
   * where do you store the recorded input
   * which format is used (write your own format)
+  
+## Not supportd
+I need to get this working somehow.
+This is why I currently ignored to deal with software triggered input capabilities.
+This simply should not be necessary to be recorded, as recordings are supposed to record what input influences the program flow.
+Not how the program flow influences the input.
+Although, I guess, it wouldn't be too hard to record them.
+This is what won't be ensured during playback for it simply doesn't get recorded:
+* catching back key on android
+* catch menu key on android
+* catching cursor on desktop and saving its success (getCursorCatched)
+* setting the cursor 
+* making the software keyboard visible
 
 ## Future development
 * get recording to work with simple writer/ output format

@@ -36,25 +36,25 @@ class InputStateTracker {
 
 		int toSet = 0;
 		if (recorder.getConfiguration().recordButtons) {
-			toSet |= InputValue.SyncValue.Types.BUTTONS.key;
+			toSet |= InputValue.SyncValue.Type.BUTTONS.key;
 		}
 		if (recorder.getConfiguration().recordOrientation) {
-			toSet |= InputValue.SyncValue.Types.ORIENTATION.key;
+			toSet |= InputValue.SyncValue.Type.ORIENTATION.key;
 		}
 		if (recorder.getConfiguration().recordKeysPressed) {
-			toSet |= InputValue.SyncValue.Types.KEYS_PRESSED.key;
+			toSet |= InputValue.SyncValue.Type.KEYS_PRESSED.key;
 		}
 		if (recorder.getConfiguration().recordPointers) {
-			toSet |= InputValue.SyncValue.Types.POINTERS.key;
+			toSet |= InputValue.SyncValue.Type.POINTERS.key;
 		}
 		valuesTrackFlags = toSet;
 
 		toSet = 0;
 		if (recorder.getConfiguration().recordKeyEvents) {
-			toSet |= InputValue.SyncValue.Types.KEY_EVENTS.key;
+			toSet |= InputValue.SyncValue.Type.KEY_EVENTS.key;
 		}
-		if (recorder.getConfiguration().recordTouchEvents) {
-			toSet |= InputValue.SyncValue.Types.TOUCH_EVENTS.key;
+		if (recorder.getConfiguration().recordPointerEvents) {
+			toSet |= InputValue.SyncValue.Type.POINTER_EVENTS.key;
 		}
 		buffersTrackFlag = toSet;
 
@@ -215,8 +215,8 @@ class InputStateTracker {
 				bufferStates = processStates;
 			}
 			processStates = swap;
-			Gdx.app.log(InputRecorder.LOG_TAG, "Now processing "
-					+ processStates.size() + " InputStates");
+			// Gdx.app.log(InputRecorder.LOG_TAG, "Now processing "
+			// + processStates.size() + " InputStates");
 			for (InputState state : processStates) {
 				processor.process(state);
 				statePool.free(state);

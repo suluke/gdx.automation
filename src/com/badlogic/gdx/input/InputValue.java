@@ -3,10 +3,16 @@ package com.badlogic.gdx.input;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Orientation;
 import com.badlogic.gdx.Input.Peripheral;
+import com.badlogic.gdx.input.EventBufferAccessHelper.KeyState;
+import com.badlogic.gdx.input.EventBufferAccessHelper.PointerState;
 import com.badlogic.gdx.input.InputValue.AsyncValue.PlaceholderText;
 import com.badlogic.gdx.input.InputValue.AsyncValue.Text;
+import com.badlogic.gdx.input.InputValue.SyncValue.Accelerometer;
 import com.badlogic.gdx.input.InputValue.SyncValue.Button;
+import com.badlogic.gdx.input.InputValue.SyncValue.KeyEvent;
+import com.badlogic.gdx.input.InputValue.SyncValue.KeyPressed;
 import com.badlogic.gdx.input.InputValue.SyncValue.Pointer;
+import com.badlogic.gdx.input.InputValue.SyncValue.PointerEvent;
 
 /**
  * Parent class of all (groups of) properties that make up an {@link InputState}
@@ -20,13 +26,18 @@ public abstract class InputValue {
 	}
 
 	public static abstract class SyncValue {
-		public enum Types {
-			POINTERS(1), BUTTONS(2), TOUCH_EVENTS(4), KEY_EVENTS(8), KEYS_PRESSED(
+		public enum Type {
+			POINTERS(1), BUTTONS(2), POINTER_EVENTS(4), KEY_EVENTS(8), KEYS_PRESSED(
 					16), ORIENTATION(32);
 
+			/**
+			 * binary flag unique for each {@link Type} to be able to specify
+			 * any combination of Types without having to specify an array and
+			 * without the overhead to search in it. Just "&" the key to an int.
+			 */
 			int key;
 
-			private Types(int key) {
+			private Type(int key) {
 				this.key = key;
 			}
 		}
@@ -38,14 +49,81 @@ public abstract class InputValue {
 		 */
 		public long timeDelta;
 
-		public static class Orientation extends SyncValue {
+		public static class Accelerometer extends SyncValue {
 			public float accelerometerX;
 			public float accelerometerY;
 			public float accelerometerZ;
 
 			@Override
 			public void accept(SyncValueVisitor visitor) {
+				visitor.visitAccelerometer(this);
+			}
+		}
+
+		public static class Orientation extends SyncValue {
+			public float roll;
+			public float pitch;
+			public float azimuth;
+			public int orientation;
+			public float[] rotationMatrix = new float[16];
+
+			@Override
+			public void accept(SyncValueVisitor visitor) {
 				visitor.visitOrientation(this);
+			}
+
+		}
+
+		public static class KeyPressed extends SyncValue {
+
+			public int keyCode;
+
+			@Override
+			public void accept(SyncValueVisitor visitor) {
+				visitor.visitKeyPressed(this);
+			}
+
+		}
+
+		public static class KeyEvent extends SyncValue {
+			public KeyState type;
+			public int keyCode;
+			public char keyChar;
+
+			KeyEvent(
+					com.badlogic.gdx.input.EventBufferAccessHelper.KeyEvent event) {
+				type = event.type;
+				keyCode = event.keyCode;
+				keyChar = event.keyChar;
+			}
+
+			@Override
+			public void accept(SyncValueVisitor visitor) {
+				visitor.visitKeyEvent(this);
+			}
+		}
+
+		public static class PointerEvent extends SyncValue {
+			public PointerState type;
+			public int x;
+			public int y;
+			public int scrollAmount;
+			public int button;
+			public int pointer;
+
+			PointerEvent(
+					com.badlogic.gdx.input.EventBufferAccessHelper.PointerEvent event) {
+				type = event.type;
+				x = event.x;
+				y = event.y;
+				scrollAmount = event.scrollAmount;
+				button = event.button;
+				pointer = event.pointer;
+			}
+
+			@Override
+			public void accept(SyncValueVisitor visitor) {
+				visitor.visitPointerEvent(this);
 			}
 		}
 
@@ -66,7 +144,6 @@ public abstract class InputValue {
 			public boolean button0;
 			public boolean button1;
 			public boolean button2;
-			public boolean cursorCatched;
 
 			@Override
 			public void accept(SyncValueVisitor visitor) {
@@ -76,6 +153,14 @@ public abstract class InputValue {
 	}
 
 	public static interface SyncValueVisitor {
+		void visitAccelerometer(Accelerometer accelerometer);
+
+		void visitKeyPressed(KeyPressed keyPressed);
+
+		void visitPointerEvent(PointerEvent pointerEvent);
+
+		void visitKeyEvent(KeyEvent keyEvent);
+
 		void visitOrientation(
 				com.badlogic.gdx.input.InputValue.SyncValue.Orientation orientation);
 
@@ -135,7 +220,7 @@ public abstract class InputValue {
 		public boolean onscreenKeyboard;
 		public boolean vibrator;
 		public boolean hasMultitouch;
-		Orientation nativeOrientation;
+		public Orientation nativeOrientation;
 	}
 
 	public static StaticValues getCurrentStaticValues() {

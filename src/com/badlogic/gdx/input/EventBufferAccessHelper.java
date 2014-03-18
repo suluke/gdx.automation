@@ -24,7 +24,7 @@ import com.badlogic.gdx.utils.IntMap.Keys;
  */
 class EventBufferAccessHelper {
 	static final ArrayList<KeyEvent> keyEvents = new ArrayList<KeyEvent>();
-	static final ArrayList<TouchEvent> touchEvents = new ArrayList<TouchEvent>();
+	static final ArrayList<PointerEvent> pointerEvents = new ArrayList<PointerEvent>();
 	private static final SparseArray<Boolean> pressedKeys = new SparseArray<Boolean>();
 
 	static enum KeyState {
@@ -56,9 +56,9 @@ class EventBufferAccessHelper {
 		char keyChar;
 	}
 
-	static enum TouchState {
+	static enum PointerState {
 		TOUCH_DOWN, TOUCH_UP, TOUCH_DRAGGED, TOUCH_SCROLLED, TOUCH_MOVED;
-		public static TouchState mapAndroid(int i) {
+		public static PointerState mapAndroid(int i) {
 			switch (i) {
 			case 0:
 				return TOUCH_DOWN;
@@ -72,7 +72,7 @@ class EventBufferAccessHelper {
 			}
 		}
 
-		public static TouchState mapDesktop(int i) {
+		public static PointerState mapDesktop(int i) {
 			switch (i) {
 			case 0:
 				return TOUCH_DOWN;
@@ -91,9 +91,9 @@ class EventBufferAccessHelper {
 		}
 	}
 
-	static class TouchEvent {
+	static class PointerEvent {
 		long timeStamp;
-		TouchState type;
+		PointerState type;
 		int x;
 		int y;
 		int scrollAmount;
@@ -155,8 +155,8 @@ class EventBufferAccessHelper {
 		return keyEvents;
 	}
 
-	public static List<TouchEvent> accessTouchEvents(Input input) {
-		return accessTouchEvents(input, true);
+	public static List<PointerEvent> accessPointerEvents(Input input) {
+		return accessPointerEvents(input, true);
 	}
 
 	/**
@@ -169,7 +169,7 @@ class EventBufferAccessHelper {
 	 *            {@link LwjglInput#processEvents processEvents}
 	 * @return
 	 */
-	static List<TouchEvent> accessTouchEvents(Input input, boolean update) {
+	static List<PointerEvent> accessPointerEvents(Input input, boolean update) {
 		while (input instanceof InputProxy) {
 			input = ((InputProxy) input).getProxiedInput();
 		}
@@ -177,12 +177,12 @@ class EventBufferAccessHelper {
 			callMethod("updateMouse", input, null, null);
 		}
 		@SuppressWarnings("unchecked")
-		List<Object> inputTouchEvents = (List<Object>) accessField(
+		List<Object> inputPointerEvents = (List<Object>) accessField(
 				getField(input.getClass(), "touchEvents"), input);
-		synchronized (touchEvents) {
-			touchEvents.clear();
-			for (Object event : inputTouchEvents) {
-				TouchEvent e = new TouchEvent();
+		synchronized (pointerEvents) {
+			pointerEvents.clear();
+			for (Object event : inputPointerEvents) {
+				PointerEvent e = new PointerEvent();
 				e.x = (Integer) accessField(getField(event.getClass(), "x"),
 						event);
 				e.y = (Integer) accessField(getField(event.getClass(), "y"),
@@ -196,15 +196,15 @@ class EventBufferAccessHelper {
 							getField(event.getClass(), "scrollAmount"), event);
 					e.button = (Integer) accessField(
 							getField(event.getClass(), "button"), event);
-					e.type = TouchState.mapDesktop((Integer) accessField(
+					e.type = PointerState.mapDesktop((Integer) accessField(
 							getField(event.getClass(), "type"), event));
 				} else {
-					e.type = TouchState.mapAndroid((Integer) accessField(
+					e.type = PointerState.mapAndroid((Integer) accessField(
 							getField(event.getClass(), "type"), event));
 				}
 			}
 		}
-		return touchEvents;
+		return pointerEvents;
 	}
 
 	public static void copyKeyEvents(Input input, List<KeyEvent> copyInto,
@@ -215,11 +215,11 @@ class EventBufferAccessHelper {
 		}
 	}
 
-	public static void copyTouchEvents(Input input, List<TouchEvent> copyInto,
-			boolean update) {
+	public static void copyPointerEvents(Input input,
+			List<PointerEvent> copyInto, boolean update) {
 		copyInto.clear();
-		synchronized (touchEvents) {
-			Collections.copy(accessTouchEvents(input, update), copyInto);
+		synchronized (pointerEvents) {
+			Collections.copy(accessPointerEvents(input, update), copyInto);
 		}
 	}
 

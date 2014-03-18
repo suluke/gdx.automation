@@ -8,7 +8,7 @@ import java.util.Arrays;
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.input.InputValue.SyncValue.Types;
+import com.badlogic.gdx.input.InputValue.SyncValue.Type;
 import com.badlogic.gdx.utils.TimeUtils;
 
 public class InputState {
@@ -34,7 +34,7 @@ public class InputState {
 	public final SparseArray<Boolean> pressedKeys;
 
 	public final ArrayList<EventBufferAccessHelper.KeyEvent> keyEvents;
-	public final ArrayList<EventBufferAccessHelper.TouchEvent> touchEvents;
+	public final ArrayList<EventBufferAccessHelper.PointerEvent> pointerEvents;
 
 	public float pitch;
 	public float roll;
@@ -44,14 +44,12 @@ public class InputState {
 
 	public int orientation;
 
-	public boolean cursorCatched;
-
 	public long timeStamp;
 
 	public InputState() {
 		pressedKeys = new SparseArray<Boolean>();
 		keyEvents = new ArrayList<EventBufferAccessHelper.KeyEvent>();
-		touchEvents = new ArrayList<EventBufferAccessHelper.TouchEvent>();
+		pointerEvents = new ArrayList<EventBufferAccessHelper.PointerEvent>();
 	}
 
 	public InputState(int maxPointers) {
@@ -96,19 +94,18 @@ public class InputState {
 	}
 
 	public void set(InputState state, int copyFlags) {
-		if ((copyFlags & Types.BUTTONS.key) != 0) {
+		if ((copyFlags & Type.BUTTONS.key) != 0) {
 			button0 = state.button0;
 			button1 = state.button1;
 			button2 = state.button2;
-			cursorCatched = state.cursorCatched;
 		}
-		if ((copyFlags & Types.KEY_EVENTS.key) != 0) {
+		if ((copyFlags & Type.KEY_EVENTS.key) != 0) {
 
 		}
-		if ((copyFlags & Types.KEYS_PRESSED.key) != 0) {
+		if ((copyFlags & Type.KEYS_PRESSED.key) != 0) {
 
 		}
-		if ((copyFlags & Types.ORIENTATION.key) != 0) {
+		if ((copyFlags & Type.ORIENTATION.key) != 0) {
 			accelerometerX = state.accelerometerX;
 			accelerometerY = state.accelerometerY;
 			accelerometerZ = state.accelerometerZ;
@@ -118,21 +115,21 @@ public class InputState {
 			orientation = state.orientation;
 			System.arraycopy(state.rotationMatrix, 0, rotationMatrix, 0, 16);
 		}
-		if ((copyFlags & Types.POINTERS.key) != 0) {
+		if ((copyFlags & Type.POINTERS.key) != 0) {
 			System.arraycopy(state.x, 0, x, 0, MAX_POINTERS);
 			System.arraycopy(state.y, 0, y, 0, MAX_POINTERS);
 			System.arraycopy(state.deltaX, 0, deltaX, 0, MAX_POINTERS);
 			System.arraycopy(state.deltaY, 0, deltaY, 0, MAX_POINTERS);
 			System.arraycopy(state.touched, 0, touched, 0, MAX_POINTERS);
-			justTouched = state.cursorCatched;
+			justTouched = state.justTouched;
 		}
-		if ((copyFlags & Types.TOUCH_EVENTS.key) != 0) {
+		if ((copyFlags & Type.POINTER_EVENTS.key) != 0) {
 
 		}
 	}
 
 	/**
-	 * Use OR'ed {@link InputValue.Types#key}s to define properties
+	 * Use OR'ed {@link InputValue.Type#key}s to define properties
 	 * 
 	 * @param input
 	 * @param properties
@@ -143,26 +140,26 @@ public class InputState {
 	public void set(Input input, int properties, boolean updateEvents) {
 		timeStamp = TimeUtils.millis(); // input in milliseconds should be
 										// sufficient
-		if ((InputValue.SyncValue.Types.POINTERS.key & properties) != 0) {
+		if ((InputValue.SyncValue.Type.POINTERS.key & properties) != 0) {
 			setX(input);
 			setY(input);
 			setDeltaX(input);
 			setDeltaY(input);
 			setTouched(input);
 		}
-		if ((InputValue.SyncValue.Types.BUTTONS.key & properties) != 0) {
+		if ((InputValue.SyncValue.Type.BUTTONS.key & properties) != 0) {
 			setButtons(input);
 		}
-		if ((InputValue.SyncValue.Types.KEYS_PRESSED.key & properties) != 0) {
+		if ((InputValue.SyncValue.Type.KEYS_PRESSED.key & properties) != 0) {
 			setPressedKeys(input);
 		}
-		if ((InputValue.SyncValue.Types.KEY_EVENTS.key & properties) != 0) {
+		if ((InputValue.SyncValue.Type.KEY_EVENTS.key & properties) != 0) {
 			setKeyEvents(input, updateEvents);
 		}
-		if ((InputValue.SyncValue.Types.TOUCH_EVENTS.key & properties) != 0) {
-			setTouchEvents(input, updateEvents);
+		if ((InputValue.SyncValue.Type.POINTER_EVENTS.key & properties) != 0) {
+			setPointerEvents(input, updateEvents);
 		}
-		if ((InputValue.SyncValue.Types.ORIENTATION.key & properties) != 0) {
+		if ((InputValue.SyncValue.Type.ORIENTATION.key & properties) != 0) {
 			setOrientation(input);
 		}
 	}
@@ -212,8 +209,8 @@ public class InputState {
 		EventBufferAccessHelper.copyKeyEvents(input, keyEvents, update);
 	}
 
-	private void setTouchEvents(Input input, boolean update) {
-		EventBufferAccessHelper.copyTouchEvents(input, touchEvents, update);
+	private void setPointerEvents(Input input, boolean update) {
+		EventBufferAccessHelper.copyPointerEvents(input, pointerEvents, update);
 	}
 
 	private void setOrientation(Input input) {
@@ -392,10 +389,6 @@ public class InputState {
 
 	public int getRotation() {
 		return orientation;
-	}
-
-	public boolean isCursorCatched() {
-		return cursorCatched;
 	}
 
 	/**

@@ -45,7 +45,7 @@ public class InputRecorderConfiguration {
 	/**
 	 * 
 	 */
-	public boolean recordTouchEvents = true;
+	public boolean recordPointerEvents = true;
 
 	/**
 	 * 
@@ -71,7 +71,7 @@ public class InputRecorderConfiguration {
 		copy.recordKeysPressed = original.recordKeysPressed;
 		copy.recordPointers = original.recordPointers;
 		copy.recordedPointerCount = original.recordedPointerCount;
-		copy.recordTouchEvents = original.recordTouchEvents;
+		copy.recordPointerEvents = original.recordPointerEvents;
 		copy.absoluteCoords = original.absoluteCoords;
 		copy.outputFile = original.outputFile;
 		copy.writer = original.writer;
