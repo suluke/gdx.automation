@@ -20,12 +20,12 @@ public class InputRecorderConfiguration {
 	/**
 	 * 
 	 */
-	public boolean recordButtons = true;
+	public boolean recordButtons = false;
 
 	/**
 	 * 
 	 */
-	public boolean recordPointers = true;
+	public boolean recordPointers = false;
 
 	/**
 	 * 
@@ -35,7 +35,7 @@ public class InputRecorderConfiguration {
 	/**
 	 * 
 	 */
-	public int recordedPointerCount = 3;
+	public int recordedPointerCount = 0;
 
 	/**
 	 * 
