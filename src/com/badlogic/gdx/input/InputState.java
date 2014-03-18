@@ -69,6 +69,9 @@ public class InputState {
 	}
 
 	public void initialize(int maxPointers) {
+		pressedKeys.clear();
+		keyEvents.clear();
+		pointerEvents.clear();
 		if (maxPointers != MAX_POINTERS) {
 			if (maxPointers > MAX_POINTERS) {
 				if (maxPointers > 20) {
