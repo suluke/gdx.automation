@@ -33,7 +33,10 @@ public class InputRecorderConfiguration {
 	public boolean recordOrientation = false;
 
 	/**
-	 * 
+	 * The number of pointers recorded if {@link #recordPointers} is enabled.
+	 * LibGDX doesn't provide more than 20 buffer spaces for pointer values to
+	 * be stored in, so be aware that setting this value higher than 20 is very
+	 * likely to cause crashes.
 	 */
 	public int recordedPointerCount = 0;
 
@@ -55,7 +58,7 @@ public class InputRecorderConfiguration {
 	/**
 	 * The default value is null, meaning that the {@link InputRecorder} will
 	 * create a default {@link InputRecordWriter} (a
-	 * {@link SimpleInputRecordWriter})
+	 * {@link JsonInputRecordWriter})
 	 */
 	public InputRecordWriter writer = null;
 

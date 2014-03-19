@@ -1,5 +1,7 @@
 package com.badlogic.gdx.input;
 
+import java.io.IOException;
+
 import com.badlogic.gdx.Files.FileType;
 import com.badlogic.gdx.Gdx;
 
@@ -39,22 +41,30 @@ public class InputRecorder {
 				config.outputFile = Gdx.files.getFileHandle(standardOutputPath,
 						standardOutputLocation);
 			}
-			writer = new SimpleInputRecordWriter(config.outputFile);
+			try {
+				writer = new JsonInputRecordWriter(config.outputFile);
+			} catch (IOException e) {
+				throw new IllegalStateException(
+						"Unable to create InputRecordWriter for file "
+								+ config.outputFile);
+			}
 		}
 	}
 
-	public void startRecording() {
+	public void startRecording() throws IOException {
+		writer.open();
 		writer.writeStaticValues(InputValue.getCurrentStaticValues());
 		textTracker.startTracking();
 		valueTracker.startTracking();
 	}
 
-	public void stopRecording() {
+	public void stopRecording() throws IOException {
 		textTracker.stopTracking();
 		valueTracker.startTracking();
+		writer.close();
 	}
 
-	public void flush() {
+	public void flush() throws IOException {
 		writer.flush();
 	}
 
@@ -66,7 +76,13 @@ public class InputRecorder {
 		valueTracker.stopTracking();
 
 		synchronized (this.writer) {
-			flush();
+			try {
+				flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+				Gdx.app.log(LOG_TAG,
+						"Probable loss of recorded data (see exception trace)");
+			}
 			this.writer = writer;
 		}
 
