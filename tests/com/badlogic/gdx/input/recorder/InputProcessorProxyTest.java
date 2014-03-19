@@ -1,4 +1,4 @@
-package com.badlogic.gdx.input;
+package com.badlogic.gdx.input.recorder;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -9,6 +9,8 @@ import org.junit.Test;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.input.recorder.InputProcessorProxy;
+import com.badlogic.gdx.input.recorder.InputProxy;
 
 public class InputProcessorProxyTest {
 	private InputProcessor testProcessor;

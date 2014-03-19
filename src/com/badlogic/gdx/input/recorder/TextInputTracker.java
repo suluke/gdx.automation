@@ -1,9 +1,9 @@
-package com.badlogic.gdx.input;
+package com.badlogic.gdx.input.recorder;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.input.InputValue.AsyncValue.PlaceholderText;
-import com.badlogic.gdx.input.InputValue.AsyncValue.Text;
+import com.badlogic.gdx.input.recorder.InputValue.AsyncValue.PlaceholderText;
+import com.badlogic.gdx.input.recorder.InputValue.AsyncValue.Text;
 
 /**
  * 

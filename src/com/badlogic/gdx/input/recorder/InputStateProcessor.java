@@ -1,13 +1,13 @@
-package com.badlogic.gdx.input;
+package com.badlogic.gdx.input.recorder;
 
-import com.badlogic.gdx.input.EventBufferAccessHelper.KeyEvent;
-import com.badlogic.gdx.input.EventBufferAccessHelper.PointerEvent;
-import com.badlogic.gdx.input.InputValue.SyncValue.Accelerometer;
-import com.badlogic.gdx.input.InputValue.SyncValue.Button;
-import com.badlogic.gdx.input.InputValue.SyncValue.KeyPressed;
-import com.badlogic.gdx.input.InputValue.SyncValue.Orientation;
-import com.badlogic.gdx.input.InputValue.SyncValue.Pointer;
-import com.badlogic.gdx.input.InputValue.SyncValue.Type;
+import com.badlogic.gdx.input.recorder.EventBufferAccessHelper.KeyEvent;
+import com.badlogic.gdx.input.recorder.EventBufferAccessHelper.PointerEvent;
+import com.badlogic.gdx.input.recorder.InputValue.SyncValue.Accelerometer;
+import com.badlogic.gdx.input.recorder.InputValue.SyncValue.Button;
+import com.badlogic.gdx.input.recorder.InputValue.SyncValue.KeyPressed;
+import com.badlogic.gdx.input.recorder.InputValue.SyncValue.Orientation;
+import com.badlogic.gdx.input.recorder.InputValue.SyncValue.Pointer;
+import com.badlogic.gdx.input.recorder.InputValue.SyncValue.Type;
 
 /**
  * A class to be fed InputStates via {@link #process(InputState)} so it can
@@ -100,7 +100,7 @@ class InputStateProcessor {
 	private void processKeyEvents(InputState state) {
 		InputRecordWriter writer = recorder.getRecordWriter();
 		for (KeyEvent event : state.keyEvents) {
-			com.badlogic.gdx.input.InputValue.SyncValue.KeyEvent valueEvent = new com.badlogic.gdx.input.InputValue.SyncValue.KeyEvent(
+			com.badlogic.gdx.input.recorder.InputValue.SyncValue.KeyEvent valueEvent = new com.badlogic.gdx.input.recorder.InputValue.SyncValue.KeyEvent(
 					event);
 			valueEvent.timeDelta = timeDelta;
 			writer.writeSyncValues(valueEvent);
@@ -166,7 +166,7 @@ class InputStateProcessor {
 	private void processPointerEvents(InputState state) {
 		InputRecordWriter writer = recorder.getRecordWriter();
 		for (PointerEvent event : state.pointerEvents) {
-			com.badlogic.gdx.input.InputValue.SyncValue.PointerEvent ptrEvent = new com.badlogic.gdx.input.InputValue.SyncValue.PointerEvent(
+			com.badlogic.gdx.input.recorder.InputValue.SyncValue.PointerEvent ptrEvent = new com.badlogic.gdx.input.recorder.InputValue.SyncValue.PointerEvent(
 					event);
 			ptrEvent.timeDelta = timeDelta;
 			writer.writeSyncValues(ptrEvent);

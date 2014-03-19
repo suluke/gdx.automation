@@ -1,24 +1,24 @@
-package com.badlogic.gdx.input;
+package com.badlogic.gdx.input.recorder;
 
 import java.io.IOException;
 import java.io.Writer;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.input.InputValue.AsyncValue;
-import com.badlogic.gdx.input.InputValue.AsyncValue.PlaceholderText;
-import com.badlogic.gdx.input.InputValue.AsyncValue.Text;
-import com.badlogic.gdx.input.InputValue.AsyncValueVisitor;
-import com.badlogic.gdx.input.InputValue.StaticValues;
-import com.badlogic.gdx.input.InputValue.SyncValue;
-import com.badlogic.gdx.input.InputValue.SyncValue.Accelerometer;
-import com.badlogic.gdx.input.InputValue.SyncValue.Button;
-import com.badlogic.gdx.input.InputValue.SyncValue.KeyEvent;
-import com.badlogic.gdx.input.InputValue.SyncValue.KeyPressed;
-import com.badlogic.gdx.input.InputValue.SyncValue.Orientation;
-import com.badlogic.gdx.input.InputValue.SyncValue.Pointer;
-import com.badlogic.gdx.input.InputValue.SyncValue.PointerEvent;
-import com.badlogic.gdx.input.InputValue.SyncValueVisitor;
+import com.badlogic.gdx.input.recorder.InputValue.AsyncValue;
+import com.badlogic.gdx.input.recorder.InputValue.AsyncValue.PlaceholderText;
+import com.badlogic.gdx.input.recorder.InputValue.AsyncValue.Text;
+import com.badlogic.gdx.input.recorder.InputValue.AsyncValueVisitor;
+import com.badlogic.gdx.input.recorder.InputValue.StaticValues;
+import com.badlogic.gdx.input.recorder.InputValue.SyncValue;
+import com.badlogic.gdx.input.recorder.InputValue.SyncValue.Accelerometer;
+import com.badlogic.gdx.input.recorder.InputValue.SyncValue.Button;
+import com.badlogic.gdx.input.recorder.InputValue.SyncValue.KeyEvent;
+import com.badlogic.gdx.input.recorder.InputValue.SyncValue.KeyPressed;
+import com.badlogic.gdx.input.recorder.InputValue.SyncValue.Orientation;
+import com.badlogic.gdx.input.recorder.InputValue.SyncValue.Pointer;
+import com.badlogic.gdx.input.recorder.InputValue.SyncValue.PointerEvent;
+import com.badlogic.gdx.input.recorder.InputValue.SyncValueVisitor;
 import com.badlogic.gdx.utils.JsonWriter;
 import com.badlogic.gdx.utils.JsonWriter.OutputType;
 
@@ -255,6 +255,9 @@ public class JsonInputRecordWriter implements InputRecordWriter {
 
 		syncJsonWriter = new JsonWriter(syncFileWriter);
 		asyncJsonWriter = new JsonWriter(asyncFileWriter);
+
+		syncJsonWriter.setOutputType(OutputType.minimal);
+		asyncJsonWriter.setOutputType(OutputType.minimal);
 
 		syncJsonWriter.array();
 		asyncJsonWriter.array();

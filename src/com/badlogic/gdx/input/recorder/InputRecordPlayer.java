@@ -1,4 +1,4 @@
-package com.badlogic.gdx.input;
+package com.badlogic.gdx.input.recorder;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;

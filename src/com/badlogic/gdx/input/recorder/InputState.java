@@ -1,4 +1,4 @@
-package com.badlogic.gdx.input;
+package com.badlogic.gdx.input.recorder;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -8,7 +8,7 @@ import java.util.Arrays;
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.input.InputValue.SyncValue.Type;
+import com.badlogic.gdx.input.recorder.InputValue.SyncValue.Type;
 import com.badlogic.gdx.utils.TimeUtils;
 
 public class InputState {

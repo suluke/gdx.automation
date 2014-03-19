@@ -1,4 +1,4 @@
-package com.badlogic.gdx.input;
+package com.badlogic.gdx.input.recorder;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -25,6 +25,13 @@ class EventBufferAccessHelper {
 	static final ArrayList<KeyEvent> keyEvents = new ArrayList<KeyEvent>();
 	static final ArrayList<PointerEvent> pointerEvents = new ArrayList<PointerEvent>();
 	private static final SparseArray<Boolean> pressedKeys = new SparseArray<Boolean>();
+	private static List<Object> inputKeyEvents = null;
+	private static List<Object> inputPointerEvents = null;
+	private static IntMap<Object> keysPressedAndroid = null;
+	private static java.nio.ByteBuffer keysPressedDesktop = null;
+	private static Input keyPressedFrom = null;
+	private static Input pointerEventsFrom = null;
+	private static Input keyEventsFrom = null;
 
 	static enum KeyState {
 		KEY_DOWN, KEY_UP, KEY_TYPED;
@@ -117,6 +124,7 @@ class EventBufferAccessHelper {
 	 *            {@link LwjglInput#processEvents processEvents}
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	static List<KeyEvent> accessKeyEvents(Input input, boolean update) {
 		while (input instanceof InputProxy) {
 			input = ((InputProxy) input).getProxiedInput();
@@ -124,9 +132,11 @@ class EventBufferAccessHelper {
 		if (update && Gdx.app.getType() == ApplicationType.Desktop) {
 			callMethod("updateKeyboard", input, null, null);
 		}
-		@SuppressWarnings("unchecked")
-		List<Object> inputKeyEvents = (List<Object>) accessField(
-				getField(input.getClass(), "keyEvents"), input);
+		if (inputKeyEvents == null || keyEventsFrom != input) {
+			inputKeyEvents = (List<Object>) accessField(
+					getField(input.getClass(), "keyEvents"), input);
+			keyEventsFrom = input;
+		}
 		synchronized (keyEvents) {
 			keyEvents.clear();
 			for (Object event : inputKeyEvents) {
@@ -168,6 +178,7 @@ class EventBufferAccessHelper {
 	 *            {@link LwjglInput#processEvents processEvents}
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	static List<PointerEvent> accessPointerEvents(Input input, boolean update) {
 		while (input instanceof InputProxy) {
 			input = ((InputProxy) input).getProxiedInput();
@@ -175,9 +186,11 @@ class EventBufferAccessHelper {
 		if (update && Gdx.app.getType() == ApplicationType.Desktop) {
 			callMethod("updateMouse", input, null, null);
 		}
-		@SuppressWarnings("unchecked")
-		List<Object> inputPointerEvents = (List<Object>) accessField(
-				getField(input.getClass(), "touchEvents"), input);
+		if (inputPointerEvents == null || pointerEventsFrom != input) {
+			inputPointerEvents = (List<Object>) accessField(
+					getField(input.getClass(), "touchEvents"), input);
+			pointerEventsFrom = input;
+		}
 		synchronized (pointerEvents) {
 			pointerEvents.clear();
 			for (Object event : inputPointerEvents) {
@@ -235,25 +248,31 @@ class EventBufferAccessHelper {
 		return pressedKeys;
 	}
 
+	@SuppressWarnings("unchecked")
 	private static void copyPressedKeys(Input input) {
 		// TODO no actual input type check. Just assuming on app type
 		while (input instanceof InputProxy) {
 			input = ((InputProxy) input).getProxiedInput();
 		}
 		if (Gdx.app.getType() == ApplicationType.Android) {
-			@SuppressWarnings("unchecked")
-			IntMap<Object> keys = (IntMap<Object>) accessField(
-					getField(input.getClass(), "keys"), input);
-			Keys keysKeys = keys.keys();
+			if (keysPressedAndroid == null || keyPressedFrom != input) {
+				keysPressedAndroid = (IntMap<Object>) accessField(
+						getField(input.getClass(), "keys"), input);
+				keyPressedFrom = input;
+			}
+			Keys keysKeys = keysPressedAndroid.keys();
 			while (keysKeys.hasNext) {
 				pressedKeys.append(keysKeys.next(), Boolean.TRUE);
 			}
 		} else if (Gdx.app.getType() == ApplicationType.Desktop) {
-			java.nio.ByteBuffer keyDownBuffer = (ByteBuffer) accessField(
-					getField(getClass("org.lwjgl.input.Keyboard"),
-							"keyDownBuffer"), null);
-			for (int i = 0; i < keyDownBuffer.capacity(); i++) {
-				if (keyDownBuffer.get(i) != 0) {
+			if (keysPressedDesktop == null || keyPressedFrom != input) {
+				keysPressedDesktop = (ByteBuffer) accessField(
+						getField(getClass("org.lwjgl.input.Keyboard"),
+								"keyDownBuffer"), null);
+				keyPressedFrom = input;
+			}
+			for (int i = 0; i < keysPressedDesktop.capacity(); i++) {
+				if (keysPressedDesktop.get(i) != 0) {
 					pressedKeys.put(i, Boolean.TRUE);
 				}
 			}

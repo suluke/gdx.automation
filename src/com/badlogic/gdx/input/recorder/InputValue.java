@@ -1,18 +1,18 @@
-package com.badlogic.gdx.input;
+package com.badlogic.gdx.input.recorder;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Orientation;
 import com.badlogic.gdx.Input.Peripheral;
-import com.badlogic.gdx.input.EventBufferAccessHelper.KeyState;
-import com.badlogic.gdx.input.EventBufferAccessHelper.PointerState;
-import com.badlogic.gdx.input.InputValue.AsyncValue.PlaceholderText;
-import com.badlogic.gdx.input.InputValue.AsyncValue.Text;
-import com.badlogic.gdx.input.InputValue.SyncValue.Accelerometer;
-import com.badlogic.gdx.input.InputValue.SyncValue.Button;
-import com.badlogic.gdx.input.InputValue.SyncValue.KeyEvent;
-import com.badlogic.gdx.input.InputValue.SyncValue.KeyPressed;
-import com.badlogic.gdx.input.InputValue.SyncValue.Pointer;
-import com.badlogic.gdx.input.InputValue.SyncValue.PointerEvent;
+import com.badlogic.gdx.input.recorder.EventBufferAccessHelper.KeyState;
+import com.badlogic.gdx.input.recorder.EventBufferAccessHelper.PointerState;
+import com.badlogic.gdx.input.recorder.InputValue.AsyncValue.PlaceholderText;
+import com.badlogic.gdx.input.recorder.InputValue.AsyncValue.Text;
+import com.badlogic.gdx.input.recorder.InputValue.SyncValue.Accelerometer;
+import com.badlogic.gdx.input.recorder.InputValue.SyncValue.Button;
+import com.badlogic.gdx.input.recorder.InputValue.SyncValue.KeyEvent;
+import com.badlogic.gdx.input.recorder.InputValue.SyncValue.KeyPressed;
+import com.badlogic.gdx.input.recorder.InputValue.SyncValue.Pointer;
+import com.badlogic.gdx.input.recorder.InputValue.SyncValue.PointerEvent;
 
 /**
  * Parent class of all (groups of) properties that make up an {@link InputState}
@@ -91,7 +91,7 @@ public abstract class InputValue {
 			public char keyChar;
 
 			KeyEvent(
-					com.badlogic.gdx.input.EventBufferAccessHelper.KeyEvent event) {
+					com.badlogic.gdx.input.recorder.EventBufferAccessHelper.KeyEvent event) {
 				type = event.type;
 				keyCode = event.keyCode;
 				keyChar = event.keyChar;
@@ -112,7 +112,7 @@ public abstract class InputValue {
 			public int pointer;
 
 			PointerEvent(
-					com.badlogic.gdx.input.EventBufferAccessHelper.PointerEvent event) {
+					com.badlogic.gdx.input.recorder.EventBufferAccessHelper.PointerEvent event) {
 				type = event.type;
 				x = event.x;
 				y = event.y;
@@ -162,7 +162,7 @@ public abstract class InputValue {
 		void visitKeyEvent(KeyEvent keyEvent);
 
 		void visitOrientation(
-				com.badlogic.gdx.input.InputValue.SyncValue.Orientation orientation);
+				com.badlogic.gdx.input.recorder.InputValue.SyncValue.Orientation orientation);
 
 		void visitPointer(Pointer pointer);
 
