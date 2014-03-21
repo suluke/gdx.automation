@@ -1,26 +1,9 @@
 package com.badlogic.gdx.input.recorder;
 
-import java.util.Stack;
-
-import com.badlogic.gdx.Input;
+import java.util.Iterator;
 
 public interface InputRecordReader {
-	/**
-	 * Returns a Stack of Strings that were received by the recorded application
-	 * where the topmost element is the first answer to a
-	 * {@link Input#getTextInput getTextInput} call during recording.
-	 * 
-	 * @return
-	 */
-	public Stack<String> getTextInputStack();
+	Iterator<InputValue.AsyncValue.Text> getTextIterator();
 
-	/**
-	 * Returns a Stack of Strings that were received by the recorded application
-	 * where the topmost element is the first answer to a
-	 * {@link Input#getPlaceholderTextInput getPlaceholderTextInput} call during
-	 * recording.
-	 * 
-	 * @return
-	 */
-	public Stack<String> getPlaceholderTextInputStack();
+	Iterator<InputValue.AsyncValue.PlaceholderText> getPlaceholderTextIterator();
 }

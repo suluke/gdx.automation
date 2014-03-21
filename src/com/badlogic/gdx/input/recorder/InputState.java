@@ -356,7 +356,8 @@ public class InputState {
 		if (key == Input.Keys.ANY_KEY) {
 			return pressedKeys.size() > 0;
 		} else {
-			return pressedKeys.get(key) != null;
+			return pressedKeys.containsKey(key) && pressedKeys.get(key) != null
+					&& pressedKeys.get(key);
 		}
 	}
 
