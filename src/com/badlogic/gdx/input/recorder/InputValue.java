@@ -152,6 +152,15 @@ public abstract class InputValue {
 		}
 	}
 
+	/**
+	 * An interface to enable the visitor pattern on {@link SyncValue}s. This
+	 * means, it helps to have the JVM do the dispatching of the concrete
+	 * underlying {@link SyncValue} type of an instance. Using this interface
+	 * also adds compiler support for adding new types, since extending the
+	 * interface automatically breaks concrete implementations that are not
+	 * adapted for the newly added types.
+	 * 
+	 */
 	public static interface SyncValueVisitor {
 		void visitAccelerometer(Accelerometer accelerometer);
 
@@ -207,6 +216,15 @@ public abstract class InputValue {
 		}
 	}
 
+	/**
+	 * An interface to enable the visitor pattern on {@link AsyncValue}s. This
+	 * means, it helps to have the JVM do the dispatching of the concrete
+	 * underlying {@link AsyncValue} type of an instance. Using this interface
+	 * also adds compiler support for adding new types, since extending the
+	 * interface automatically breaks concrete implementations that are not
+	 * adapted for the newly added types.
+	 * 
+	 */
 	public static interface AsyncValueVisitor {
 		void visitText(Text text);
 

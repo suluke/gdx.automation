@@ -22,6 +22,12 @@ import com.badlogic.gdx.input.recorder.InputValue.SyncValueVisitor;
 import com.badlogic.gdx.utils.JsonWriter;
 import com.badlogic.gdx.utils.JsonWriter.OutputType;
 
+/**
+ * Simple implementation of an {@link InputRecordWriter} that writes given user
+ * input data to a set of three files (one each for static, sync and async
+ * values) using the {@link JsonWriter json} format.
+ * 
+ */
 public class JsonInputRecordWriter implements InputRecordWriter {
 	private final SyncValuesHandler syncHandler = new SyncValuesHandler();
 	private final AsyncValuesHandler asyncHandler = new AsyncValuesHandler();

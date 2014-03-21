@@ -11,6 +11,12 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.input.recorder.InputValue.SyncValue.Type;
 import com.badlogic.gdx.utils.TimeUtils;
 
+/**
+ * A snapshot of all real-time values to be read from an input at a certain
+ * time. Especially the {@link #set(InputState, int)} method is useful to take a
+ * snapshot of a configurable set of properties from a given {@link Input}
+ * 
+ */
 public class InputState {
 
 	private int MAX_POINTERS;
