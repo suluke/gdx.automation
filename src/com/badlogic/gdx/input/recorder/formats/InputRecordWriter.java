@@ -1,7 +1,9 @@
-package com.badlogic.gdx.input.recorder;
+package com.badlogic.gdx.input.recorder.formats;
 
 import java.io.IOException;
 
+import com.badlogic.gdx.input.recorder.InputRecorder;
+import com.badlogic.gdx.input.recorder.InputValue;
 import com.badlogic.gdx.input.recorder.InputValue.AsyncValue;
 import com.badlogic.gdx.input.recorder.InputValue.StaticValues;
 import com.badlogic.gdx.input.recorder.InputValue.SyncValue;

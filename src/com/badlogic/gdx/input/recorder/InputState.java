@@ -138,6 +138,18 @@ public class InputState {
 	}
 
 	/**
+	 * Simple forward for {@link #set(Input, int, boolean)} using ~0 as the
+	 * second argument to indicate that all values are to be read from the given
+	 * input.
+	 * 
+	 * @param input
+	 * @param updateEvents
+	 */
+	public void setAll(Input input, boolean updateEvents) {
+		set(input, ~0, updateEvents);
+	}
+
+	/**
 	 * Use OR'ed {@link InputValue.Type#key}s to define properties
 	 * 
 	 * @param input

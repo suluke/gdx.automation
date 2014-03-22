@@ -190,7 +190,7 @@ public abstract class InputValue {
 
 			}
 
-			String input;
+			public String input;
 
 			@Override
 			public void accept(AsyncValueVisitor visitor) {
@@ -207,7 +207,7 @@ public abstract class InputValue {
 
 			}
 
-			String input;
+			public String input;
 
 			@Override
 			public void accept(AsyncValueVisitor visitor) {

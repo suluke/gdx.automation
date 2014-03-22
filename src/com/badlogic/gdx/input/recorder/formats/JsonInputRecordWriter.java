@@ -1,10 +1,11 @@
-package com.badlogic.gdx.input.recorder;
+package com.badlogic.gdx.input.recorder.formats;
 
 import java.io.IOException;
 import java.io.Writer;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.input.recorder.InputValue;
 import com.badlogic.gdx.input.recorder.InputValue.AsyncValue;
 import com.badlogic.gdx.input.recorder.InputValue.AsyncValue.PlaceholderText;
 import com.badlogic.gdx.input.recorder.InputValue.AsyncValue.Text;

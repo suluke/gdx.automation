@@ -3,6 +3,8 @@ package com.badlogic.gdx.input.recorder;
 import java.io.IOException;
 
 import com.badlogic.gdx.Files.FileType;
+import com.badlogic.gdx.input.recorder.formats.InputRecordWriter;
+import com.badlogic.gdx.input.recorder.formats.JsonInputRecordWriter;
 import com.badlogic.gdx.Gdx;
 
 /**

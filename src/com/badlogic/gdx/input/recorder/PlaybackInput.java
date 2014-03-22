@@ -2,11 +2,21 @@ package com.badlogic.gdx.input.recorder;
 
 import java.util.Iterator;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.input.recorder.EventBufferAccessHelper.KeyEvent;
+import com.badlogic.gdx.input.recorder.EventBufferAccessHelper.PointerEvent;
+import com.badlogic.gdx.input.recorder.EventBufferAccessHelper.PointerState;
 import com.badlogic.gdx.input.recorder.InputValue.AsyncValue.PlaceholderText;
 import com.badlogic.gdx.input.recorder.InputValue.AsyncValue.Text;
 
+/**
+ * A simple implementation of the {@link Input} interface, designed to simply
+ * play back what is stored in an enclosed {@link InputState}
+ * 
+ */
 class PlaybackInput extends InputProxy {
 
 	private final Iterator<Text> textIterator;
@@ -14,17 +24,22 @@ class PlaybackInput extends InputProxy {
 
 	private InputProcessor processor = null;
 	private InputState state;
-	private long currentEventTime;
+	private long currentEventTimeStamp;
 
 	private boolean paused = false;
+	private final ProcessEventsCaller processEventsCaller;
 
 	public PlaybackInput(Iterator<Text> textIterator,
 			Iterator<PlaceholderText> placeholderTextIterator) {
 		this.textIterator = textIterator;
 		this.placeholderTextIterator = placeholderTextIterator;
+		processEventsCaller = new ProcessEventsCaller();
 	}
 
 	public void setPaused(boolean paused) {
+		if (this.paused && !paused) {
+			Gdx.app.postRunnable(processEventsCaller);
+		}
 		this.paused = paused;
 	}
 
@@ -230,7 +245,7 @@ class PlaybackInput extends InputProxy {
 
 	@Override
 	public long getCurrentEventTime() {
-		return currentEventTime;
+		return currentEventTimeStamp;
 	}
 
 	@Override
@@ -277,6 +292,102 @@ class PlaybackInput extends InputProxy {
 			// TODO pause with delaying request answers or delegate to proxied
 			// input or just cancel?
 			listener.canceled();
+		}
+	}
+
+	/**
+	 * Hooks into the application's main thread/loop to notify the current
+	 * {@link InputProcessor} about key and touch events as any other backend
+	 * would do.
+	 * 
+	 */
+	private class ProcessEventsCaller implements Runnable {
+		@Override
+		public void run() {
+			PlaybackInput.this.processEvents();
+			if (!paused) {
+				Gdx.app.postRunnable(this);
+			}
+		}
+	}
+
+	/**
+	 * Code mainly stolen from AndroidInput and LwjglInput, adapted to work with
+	 * the remaining recorder code.
+	 */
+	private void processEvents() {
+		synchronized (state) {
+			state.justTouched = false;
+
+			if (processor != null) {
+				final InputProcessor processor = this.processor;
+
+				int len = state.keyEvents.size();
+				for (int i = 0; i < len; i++) {
+					KeyEvent e = state.keyEvents.get(i);
+					currentEventTimeStamp = e.timeStamp;
+					switch (e.type) {
+					case KEY_DOWN: {
+						processor.keyDown(e.keyCode);
+						break;
+					}
+					case KEY_UP: {
+						processor.keyUp(e.keyCode);
+						break;
+					}
+					case KEY_TYPED: {
+						processor.keyTyped(e.keyChar);
+						break;
+					}
+					}
+				}
+
+				len = state.pointerEvents.size();
+				for (int i = 0; i < len; i++) {
+					PointerEvent e = state.pointerEvents.get(i);
+					currentEventTimeStamp = e.timeStamp;
+					switch (e.type) {
+					case TOUCH_DOWN: {
+						processor.touchDown(e.x, e.y, e.pointer, e.button);
+						break;
+					}
+					case TOUCH_UP: {
+						processor.touchUp(e.x, e.y, e.pointer, e.button);
+						break;
+					}
+					case TOUCH_DRAGGED: {
+						processor.touchDragged(e.x, e.y, e.pointer);
+						break;
+					}
+					case TOUCH_MOVED: {
+						processor.mouseMoved(e.x, e.y);
+						break;
+					}
+					case TOUCH_SCROLLED: {
+						processor.scrolled(e.scrollAmount);
+						break;
+					}
+					}
+				}
+			} else {
+				int len = state.pointerEvents.size();
+				for (int i = 0; i < len; i++) {
+					PointerEvent e = state.pointerEvents.get(i);
+					if (e.type == PointerState.TOUCH_DOWN) {
+						state.justTouched = true;
+					}
+				}
+			}
+
+			if (state.pointerEvents.size() == 0) {
+				for (int i = 0; i < state.deltaX.length; i++) {
+					state.deltaX[0] = 0;
+					state.deltaY[0] = 0;
+				}
+			}
+
+			state.keyEvents.clear();
+			state.pointerEvents.clear();
 		}
 	}
 }
