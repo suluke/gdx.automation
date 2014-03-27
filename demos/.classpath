@@ -5,7 +5,7 @@
 	<classpathentry kind="lib" path="libs/gdx-backend-lwjgl.jar"/>
 	<classpathentry kind="lib" path="libs/gdx-natives.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/libgdx-input-recorder"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/libgdx-automation"/>
 	<classpathentry kind="lib" path="/libgdx-input-recorder/libs/gdx.jar" sourcepath="/libgdx-input-recorder/libs/sources/gdx-sources.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -1,4 +1,4 @@
-package com.badlogic.gdx.input.recorder;
+package com.badlogic.gdx.automation.recorder;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -8,7 +8,7 @@ import java.util.Arrays;
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.input.recorder.InputValue.SyncValue.Type;
+import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Type;
 import com.badlogic.gdx.utils.TimeUtils;
 
 /**

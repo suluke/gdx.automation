@@ -1,25 +1,25 @@
-package com.badlogic.gdx.input.recorder.formats;
+package com.badlogic.gdx.automation.recorder.formats;
 
 import java.io.IOException;
 import java.io.Writer;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.automation.recorder.InputValue;
+import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue;
+import com.badlogic.gdx.automation.recorder.InputValue.AsyncValueVisitor;
+import com.badlogic.gdx.automation.recorder.InputValue.StaticValues;
+import com.badlogic.gdx.automation.recorder.InputValue.SyncValue;
+import com.badlogic.gdx.automation.recorder.InputValue.SyncValueVisitor;
+import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.PlaceholderText;
+import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.Text;
+import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Accelerometer;
+import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Button;
+import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.KeyEvent;
+import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.KeyPressed;
+import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Orientation;
+import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Pointer;
+import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.PointerEvent;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.input.recorder.InputValue;
-import com.badlogic.gdx.input.recorder.InputValue.AsyncValue;
-import com.badlogic.gdx.input.recorder.InputValue.AsyncValue.PlaceholderText;
-import com.badlogic.gdx.input.recorder.InputValue.AsyncValue.Text;
-import com.badlogic.gdx.input.recorder.InputValue.AsyncValueVisitor;
-import com.badlogic.gdx.input.recorder.InputValue.StaticValues;
-import com.badlogic.gdx.input.recorder.InputValue.SyncValue;
-import com.badlogic.gdx.input.recorder.InputValue.SyncValue.Accelerometer;
-import com.badlogic.gdx.input.recorder.InputValue.SyncValue.Button;
-import com.badlogic.gdx.input.recorder.InputValue.SyncValue.KeyEvent;
-import com.badlogic.gdx.input.recorder.InputValue.SyncValue.KeyPressed;
-import com.badlogic.gdx.input.recorder.InputValue.SyncValue.Orientation;
-import com.badlogic.gdx.input.recorder.InputValue.SyncValue.Pointer;
-import com.badlogic.gdx.input.recorder.InputValue.SyncValue.PointerEvent;
-import com.badlogic.gdx.input.recorder.InputValue.SyncValueVisitor;
 import com.badlogic.gdx.utils.JsonWriter;
 import com.badlogic.gdx.utils.JsonWriter.OutputType;
 

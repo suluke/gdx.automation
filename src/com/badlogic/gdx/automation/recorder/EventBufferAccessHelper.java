@@ -1,4 +1,4 @@
-package com.badlogic.gdx.input.recorder;
+package com.badlogic.gdx.automation.recorder;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;

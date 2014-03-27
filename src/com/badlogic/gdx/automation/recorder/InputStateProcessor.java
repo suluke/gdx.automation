@@ -1,14 +1,16 @@
-package com.badlogic.gdx.input.recorder;
+package com.badlogic.gdx.automation.recorder;
 
-import com.badlogic.gdx.input.recorder.EventBufferAccessHelper.KeyEvent;
-import com.badlogic.gdx.input.recorder.EventBufferAccessHelper.PointerEvent;
-import com.badlogic.gdx.input.recorder.InputValue.SyncValue.Accelerometer;
-import com.badlogic.gdx.input.recorder.InputValue.SyncValue.Button;
-import com.badlogic.gdx.input.recorder.InputValue.SyncValue.KeyPressed;
-import com.badlogic.gdx.input.recorder.InputValue.SyncValue.Orientation;
-import com.badlogic.gdx.input.recorder.InputValue.SyncValue.Pointer;
-import com.badlogic.gdx.input.recorder.InputValue.SyncValue.Type;
-import com.badlogic.gdx.input.recorder.formats.InputRecordWriter;
+import java.io.IOException;
+
+import com.badlogic.gdx.automation.recorder.EventBufferAccessHelper.KeyEvent;
+import com.badlogic.gdx.automation.recorder.EventBufferAccessHelper.PointerEvent;
+import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Accelerometer;
+import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Button;
+import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.KeyPressed;
+import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Orientation;
+import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Pointer;
+import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Type;
+import com.badlogic.gdx.automation.recorder.formats.InputRecordWriter;
 
 /**
  * A class to be fed InputStates via {@link #process(InputState)} so it can
@@ -57,7 +59,7 @@ class InputStateProcessor {
 	 * 
 	 * @param state
 	 */
-	public void process(InputState state) {
+	public void process(InputState state) throws IOException {
 		timeDelta = lastState == null ? 0 : state.timeStamp
 				- lastState.timeStamp;
 		if ((trackedValuesFlag & Type.BUTTONS.key) != 0) {
@@ -85,7 +87,7 @@ class InputStateProcessor {
 		lastState.set(state, copiedValuesFlag);
 	}
 
-	private void processButtons(InputState state) {
+	private void processButtons(InputState state) throws IOException {
 		if (lastState == null || state.button0 != lastState.button0
 				|| state.button1 != lastState.button1
 				|| state.button2 != lastState.button2) {
@@ -98,17 +100,17 @@ class InputStateProcessor {
 		}
 	}
 
-	private void processKeyEvents(InputState state) {
+	private void processKeyEvents(InputState state) throws IOException {
 		InputRecordWriter writer = recorder.getRecordWriter();
 		for (KeyEvent event : state.keyEvents) {
-			com.badlogic.gdx.input.recorder.InputValue.SyncValue.KeyEvent valueEvent = new com.badlogic.gdx.input.recorder.InputValue.SyncValue.KeyEvent(
+			com.badlogic.gdx.automation.recorder.InputValue.SyncValue.KeyEvent valueEvent = new com.badlogic.gdx.automation.recorder.InputValue.SyncValue.KeyEvent(
 					event);
 			valueEvent.timeDelta = timeDelta;
 			writer.writeSyncValues(valueEvent);
 		}
 	}
 
-	private void processKeysPressed(InputState state) {
+	private void processKeysPressed(InputState state) throws IOException {
 		InputRecordWriter writer = recorder.getRecordWriter();
 		for (int key : state.pressedKeys.keySet()) {
 			KeyPressed pressed = new KeyPressed();
@@ -144,7 +146,7 @@ class InputStateProcessor {
 		}
 	}
 
-	private void processPointers(InputState state) {
+	private void processPointers(InputState state) throws IOException {
 		int maxPtrs = recorder.getConfiguration().recordedPointerCount;
 		InputRecordWriter writer = recorder.getRecordWriter();
 		// TODO are the deltas really dependent on the coordinates?
@@ -164,10 +166,10 @@ class InputStateProcessor {
 		}
 	}
 
-	private void processPointerEvents(InputState state) {
+	private void processPointerEvents(InputState state) throws IOException {
 		InputRecordWriter writer = recorder.getRecordWriter();
 		for (PointerEvent event : state.pointerEvents) {
-			com.badlogic.gdx.input.recorder.InputValue.SyncValue.PointerEvent ptrEvent = new com.badlogic.gdx.input.recorder.InputValue.SyncValue.PointerEvent(
+			com.badlogic.gdx.automation.recorder.InputValue.SyncValue.PointerEvent ptrEvent = new com.badlogic.gdx.automation.recorder.InputValue.SyncValue.PointerEvent(
 					event);
 			ptrEvent.timeDelta = timeDelta;
 			writer.writeSyncValues(ptrEvent);

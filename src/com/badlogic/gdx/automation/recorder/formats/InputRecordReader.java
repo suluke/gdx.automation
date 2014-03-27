@@ -1,14 +1,14 @@
-package com.badlogic.gdx.input.recorder.formats;
+package com.badlogic.gdx.automation.recorder.formats;
 
 import java.util.Iterator;
 
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.input.recorder.InputValue;
-import com.badlogic.gdx.input.recorder.InputValue.AsyncValue;
-import com.badlogic.gdx.input.recorder.InputValue.StaticValues;
-import com.badlogic.gdx.input.recorder.InputValue.SyncValue;
-import com.badlogic.gdx.input.recorder.InputValue.AsyncValue.PlaceholderText;
-import com.badlogic.gdx.input.recorder.InputValue.AsyncValue.Text;
+import com.badlogic.gdx.automation.recorder.InputValue;
+import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue;
+import com.badlogic.gdx.automation.recorder.InputValue.StaticValues;
+import com.badlogic.gdx.automation.recorder.InputValue.SyncValue;
+import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.PlaceholderText;
+import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.Text;
 
 /**
  * Interface for classes that provide access to a stream of data describing

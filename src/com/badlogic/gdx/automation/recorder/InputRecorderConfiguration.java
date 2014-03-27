@@ -1,8 +1,8 @@
-package com.badlogic.gdx.input.recorder;
+package com.badlogic.gdx.automation.recorder;
 
+import com.badlogic.gdx.automation.recorder.formats.InputRecordWriter;
+import com.badlogic.gdx.automation.recorder.formats.JsonInputRecordWriter;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.input.recorder.formats.InputRecordWriter;
-import com.badlogic.gdx.input.recorder.formats.JsonInputRecordWriter;
 
 /**
  * A class to configure new instances of {@link InputRecorder}

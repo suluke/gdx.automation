@@ -1,7 +1,7 @@
-package com.badlogic.gdx.input.recorder;
+package com.badlogic.gdx.automation.recorder;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.input.recorder.formats.InputRecordReader;
+import com.badlogic.gdx.automation.recorder.formats.InputRecordReader;
 
 /**
  * Standard implementation of a player playing back recorded or generated input.

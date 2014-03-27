@@ -1,10 +1,10 @@
-package com.badlogic.gdx.input.recorder;
+package com.badlogic.gdx.automation.recorder;
 
 import java.io.IOException;
 
 import com.badlogic.gdx.Files.FileType;
-import com.badlogic.gdx.input.recorder.formats.InputRecordWriter;
-import com.badlogic.gdx.input.recorder.formats.JsonInputRecordWriter;
+import com.badlogic.gdx.automation.recorder.formats.InputRecordWriter;
+import com.badlogic.gdx.automation.recorder.formats.JsonInputRecordWriter;
 import com.badlogic.gdx.Gdx;
 
 /**

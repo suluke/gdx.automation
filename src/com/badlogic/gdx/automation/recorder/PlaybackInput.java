@@ -1,16 +1,16 @@
-package com.badlogic.gdx.input.recorder;
+package com.badlogic.gdx.automation.recorder;
 
 import java.util.Iterator;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
+import com.badlogic.gdx.automation.recorder.EventBufferAccessHelper.KeyEvent;
+import com.badlogic.gdx.automation.recorder.EventBufferAccessHelper.PointerEvent;
+import com.badlogic.gdx.automation.recorder.EventBufferAccessHelper.PointerState;
+import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.PlaceholderText;
+import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.Text;
 import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.input.recorder.EventBufferAccessHelper.KeyEvent;
-import com.badlogic.gdx.input.recorder.EventBufferAccessHelper.PointerEvent;
-import com.badlogic.gdx.input.recorder.EventBufferAccessHelper.PointerState;
-import com.badlogic.gdx.input.recorder.InputValue.AsyncValue.PlaceholderText;
-import com.badlogic.gdx.input.recorder.InputValue.AsyncValue.Text;
 
 /**
  * A simple implementation of the {@link Input} interface, designed to simply

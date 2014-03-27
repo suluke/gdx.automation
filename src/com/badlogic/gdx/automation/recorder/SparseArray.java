@@ -1,4 +1,4 @@
-package com.badlogic.gdx.input.recorder;
+package com.badlogic.gdx.automation.recorder;
 
 import java.util.ArrayList;
 import java.util.Arrays;

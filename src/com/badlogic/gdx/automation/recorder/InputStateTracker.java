@@ -1,12 +1,13 @@
-package com.badlogic.gdx.input.recorder;
+package com.badlogic.gdx.automation.recorder;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.input.recorder.formats.InputRecordWriter;
+import com.badlogic.gdx.automation.recorder.formats.InputRecordWriter;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.ReflectionPool;
 
@@ -216,10 +217,22 @@ class InputStateTracker {
 				bufferStates = processStates;
 			}
 			processStates = swap;
-			// Gdx.app.log(InputRecorder.LOG_TAG, "Now processing "
-			// + processStates.size() + " InputStates");
 			for (InputState state : processStates) {
-				processor.process(state);
+				try {
+					processor.process(state);
+				} catch (IOException e) {
+					// TODO the error handling should get some
+					// reconsideration...
+					e.printStackTrace();
+					try {
+						recorder.stopRecording();
+					} catch (IOException ex) {
+						ex.printStackTrace();
+						// Something is seriously wrong, the whole system is
+						// wrecked
+						System.exit(1);
+					}
+				}
 				statePool.free(state);
 			}
 			processStates.clear();

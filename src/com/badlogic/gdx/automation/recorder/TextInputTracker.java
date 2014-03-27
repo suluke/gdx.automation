@@ -1,9 +1,11 @@
-package com.badlogic.gdx.input.recorder;
+package com.badlogic.gdx.automation.recorder;
+
+import java.io.IOException;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.input.recorder.InputValue.AsyncValue.PlaceholderText;
-import com.badlogic.gdx.input.recorder.InputValue.AsyncValue.Text;
+import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.PlaceholderText;
+import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.Text;
 
 /**
  * 
@@ -65,19 +67,65 @@ class TextInputTracker extends InputProxy {
 	}
 
 	private void inputText(String text) {
-		recorder.getRecordWriter().writeAsyncValues(new Text(text));
+		try {
+			recorder.getRecordWriter().writeAsyncValues(new Text(text));
+		} catch (IOException e) {
+			// TODO the error handling should get some reconsideration...
+			e.printStackTrace();
+			try {
+				recorder.stopRecording();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+				System.exit(1);
+			}
+		}
 	}
 
 	private void canceledText() {
-		recorder.getRecordWriter().writeAsyncValues(new Text(null));
+		try {
+			recorder.getRecordWriter().writeAsyncValues(new Text(null));
+		} catch (IOException e) {
+			// TODO the error handling should get some reconsideration...
+			e.printStackTrace();
+			try {
+				recorder.stopRecording();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+				System.exit(1);
+			}
+		}
 	}
 
 	private void inputPlaceholderText(String text) {
-		recorder.getRecordWriter().writeAsyncValues(new PlaceholderText(text));
+		try {
+			recorder.getRecordWriter().writeAsyncValues(
+					new PlaceholderText(text));
+		} catch (IOException e) {
+			// TODO the error handling should get some reconsideration...
+			e.printStackTrace();
+			try {
+				recorder.stopRecording();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+				System.exit(1);
+			}
+		}
 	}
 
 	private void canceledPlaceholderText() {
-		recorder.getRecordWriter().writeAsyncValues(new PlaceholderText(null));
+		try {
+			recorder.getRecordWriter().writeAsyncValues(
+					new PlaceholderText(null));
+		} catch (IOException e) {
+			// TODO the error handling should get some reconsideration...
+			e.printStackTrace();
+			try {
+				recorder.stopRecording();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+				System.exit(1);
+			}
+		}
 	}
 
 	private enum TextType {
