@@ -7,10 +7,10 @@ varying vec2 v_texCoords;
 uniform vec3 u_mouseEvs[30];
 
 void main() {
-	//~ gl_FragColor = v_color;
-	//~ float val = 0.f;
-	//~ for(int i = 0; i < 30; i++)
-		//~ val += u_mouseEvs[i].x;
-	//~ gl_FragColor = vec4(1.f + val, 1.f, 1.f, 1.f);
-	gl_FragColor = vec4(1.f, 1.f, 1.f, 1.f);
+	gl_FragColor = vec4(0.f, 0.f, 0.f, 0.f);
+	for(int i = 0; i < 30; i++) {
+		if (distance(u_mouseEvs[i].xy, gl_FragCoord.xy) <= u_mouseEvs[i].z) {
+			gl_FragColor = vec4(1.f, 1.f, 1.f, 1.f);
+		}
+	}
 }
