@@ -16,19 +16,20 @@ import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.ReflectionPool;
 
 public class InputVisualizer extends Actor {
-	private static final int MAX_EVENTS = 30;
+	private static final int MAX_EVENTS = 100;
 	private static final int MAX_EXTENT = 50;
+	private static final float EXTEND_PER_SECOND = 3 * MAX_EXTENT;
 
 	private final ShaderProgram shader;
 	private final Mesh mesh;
-	private final int mouseEventShaderLoc;
+	private final int evBufferLoc;
 	private final float[] mouseEvents = new float[3 * MAX_EVENTS];
-	private final RingBuffer<MouseEvent> mouseEventBuffer;
+	private final RingBuffer<MouseEvent> eventBuffer;
 	private final Pool<MouseEvent> eventPool;
+	private final int projMatrixLoc;
 
 	public InputVisualizer() {
-		mouseEventBuffer = new RingBuffer<InputVisualizer.MouseEvent>(
-				MAX_EVENTS);
+		eventBuffer = new RingBuffer<MouseEvent>(MAX_EVENTS);
 		eventPool = new ReflectionPool<MouseEvent>(MouseEvent.class);
 
 		shader = new ShaderProgram(
@@ -37,14 +38,32 @@ public class InputVisualizer extends Actor {
 		if (!shader.isCompiled()) {
 			Gdx.app.log("InputVisualizer", shader.getLog());
 		}
-		mouseEventShaderLoc = shader.getUniformLocation("u_mouseEvs[0]");
-		if (mouseEventShaderLoc == -1) {
+		evBufferLoc = shader.getUniformLocation("u_mouseEvs[0]");
+		projMatrixLoc = shader.getUniformLocation("u_projTrans");
+		if (evBufferLoc == -1) {
 			Gdx.app.log("InputVisualizer",
 					"No uniform with name u_mouseEvents found in shader");
 		}
 		mesh = new Mesh(false, 4, 4, VertexAttribute.Position());
 
 		addListener(new MouseListener());
+	}
+
+	@Override
+	public void act(float delta) {
+		super.act(delta);
+		synchronized (eventBuffer) {
+			for (MouseEvent ev : eventBuffer) {
+				if (!ev.overGrown) {
+					if (ev.extent >= MAX_EXTENT) {
+						ev.extent = 0;
+						ev.overGrown = true;
+					} else {
+						ev.extent += delta * EXTEND_PER_SECOND;
+					}
+				}
+			}
+		}
 	}
 
 	@Override
@@ -76,21 +95,20 @@ public class InputVisualizer extends Actor {
 		batch.end();
 		fillMouseEvents();
 		shader.begin();
-		shader.setUniform3fv(mouseEventShaderLoc, mouseEvents, 0, 30);
-		shader.setUniformMatrix("u_projTrans", batch.getProjectionMatrix());
+		shader.setUniform3fv(evBufferLoc, mouseEvents, 0, MAX_EVENTS * 3);
+		shader.setUniformMatrix(projMatrixLoc, batch.getProjectionMatrix());
 		mesh.render(shader, GL10.GL_TRIANGLE_STRIP);
 		shader.end();
 		batch.begin();
 	}
 
 	private void fillMouseEvents() {
-		synchronized (mouseEventBuffer) {
+		synchronized (eventBuffer) {
 			int i = 0;
-			for (MouseEvent ev : mouseEventBuffer) {
-				mouseEvents[i] = ev.x;
-				mouseEvents[i + 1] = ev.y;
-				mouseEvents[i + 2] = ev.extent;
-				i += 3;
+			for (MouseEvent ev : eventBuffer) {
+				mouseEvents[i++] = ev.x;
+				mouseEvents[i++] = ev.y;
+				mouseEvents[i++] = ev.extent;
 			}
 		}
 	}
@@ -111,16 +129,17 @@ public class InputVisualizer extends Actor {
 					mevent.x = v.x;
 					mevent.y = Gdx.graphics.getHeight() - v.y;
 					mevent.extent = 1;
+					mevent.overGrown = false;
 					MouseEvent overwritten;
-					synchronized (mouseEventBuffer) {
-						overwritten = mouseEventBuffer.push(mevent);
+					synchronized (eventBuffer) {
+						overwritten = eventBuffer.push(mevent);
 					}
 					if (overwritten != null) {
 						eventPool.free(overwritten);
 					}
 				}
 			}
-			return false;
+			return true;
 		}
 	}
 
@@ -131,5 +150,6 @@ public class InputVisualizer extends Actor {
 		 * Amount of pixels the event wave has spread
 		 */
 		public float extent;
+		public boolean overGrown = false;
 	}
 }

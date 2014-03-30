@@ -20,8 +20,8 @@ Below I explain what can already be achieved with the project, and in the "Futur
 * recorded input legible for both poll- and event-based applications  
   ([RemoteSender](https://github.com/libgdx/libgdx/blob/master/gdx/src/com/badlogic/gdx/input/RemoteSender.java) only supports input retrieved via InputProcessors)
 * offering means to record and playback input with just 3 additional lines of code, see below
-* replacing android's monkeyrunner already, platform independently!
-* easy to replace monkey tool, too. (currently TODO)
+* replacing android's monkeyrunner already, platform independently and in the language you already work with!
+* easy to replace monkey tool, too. (currently TODO, see `RandomInputRecordReader`)
 * architecture supporting three types of input, for easy extensibility: 
   1. static (e.g. which sensors are supported)
   2. synchronous (propagated in main loop, e.g. touch events)
@@ -53,8 +53,23 @@ public T myMethod(...) { // wherever you want to playback
 	player.startPlayback();
 }
 ```
-See my [croggle-desktop-recorder]() project's Main class for code in action.
-  
+See the demos folder and the eclipse project within for code in action:
+* `com.badlogic.demos.automation.simple`: Simple application to visualize input while recrding it with the ability to play it back
+
+## Future development
+* ~~get recording to work with simple writer/ output format~~ CHECK!
+* implement player
+* use less reflection. Use real backends with real access to platform specific code.
+* implement possibility to respond to certain inputs while recording
+  * enables writing a gui or something with hotkeys to start/pause/resume/stop recording
+* implement a player supporting to mix the recorded input with the actual input
+  * e.g. specify regions that still listen to current device events, so an onscreen button can stop a playback.
+    This would be great for tutorials.
+* implement callbacks 
+  * on replay finished, so e.g. a tutorial will automatically be replayed
+  * on certain input events, so they can be visualized
+* Implement an android style monkey tool
+
 ## Not supported
 * Recording of software triggered input capabilities like 
   * catching back key on android
@@ -67,20 +82,6 @@ See my [croggle-desktop-recorder]() project's Main class for code in action.
   Not how the program flow influences the input.
   Although, I guess, it wouldn't be too hard to record them.
 
-## Future development
-* ~~get recording to work with simple writer/ output format~~ CHECK
-* implement player
-* use less reflection. Real backends with real access to platform specific code.
-* implement possibility to respond to certain inputs while recording
-  * enables writing a gui or something with hotkeys to start/pause/resume/stop recording
-* implement a player supporting to mix the recorded input with the actual input
-  * e.g. specify regions that still listen to current device events, so an onscreen button can stop a playback.
-    This would be great for tutorials.
-* implement callbacks 
-  * on replay finished, so e.g. a tutorial will automatically be replayed
-  * on certain input events, so they can be visualized
-* Implement an android style monkey tool
-  
 ## Licensing
 Copyright 2014 Lukas Böhm
 

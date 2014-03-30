@@ -65,7 +65,7 @@ public class RingBuffer<T> implements Iterable<T> {
 		int off = head - items;
 		int id = index + off;
 		if (id < 0) {
-			return buffer[buffer.length - id];
+			return buffer[buffer.length + id];
 		} else {
 			return buffer[id];
 		}
