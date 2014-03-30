@@ -17,8 +17,8 @@ import com.badlogic.gdx.utils.ReflectionPool;
 
 public class InputVisualizer extends Actor {
 	private static final int MAX_EVENTS = 100;
-	private static final int MAX_EXTENT = 50;
-	private static final float EXTEND_PER_SECOND = 3 * MAX_EXTENT;
+	private static final int MAX_EXTENT = 100;
+	private static final float EXTEND_PER_SECOND = MAX_EXTENT;
 
 	private final ShaderProgram shader;
 	private final Mesh mesh;
