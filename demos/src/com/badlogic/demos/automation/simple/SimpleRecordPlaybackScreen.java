@@ -1,8 +1,9 @@
-package com.badlogic.demos.inputrecorder.simple;
+package com.badlogic.demos.automation.simple;
 
-import com.badlogic.demos.inputrecorder.AbstractScreen;
-import com.badlogic.demos.inputrecorder.Game;
-import com.badlogic.demos.inputrecorder.StyleHelper;
+import com.badlogic.demos.automation.AbstractScreen;
+import com.badlogic.demos.automation.Game;
+import com.badlogic.demos.automation.InputVisualizer;
+import com.badlogic.demos.automation.StyleHelper;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -37,6 +38,7 @@ public class SimpleRecordPlaybackScreen extends AbstractScreen {
 	private final TextButton stopRecord;
 	private final TextButton playback;
 	private final TextButton dropRecord;
+	private final InputVisualizer visualizer;
 
 	public SimpleRecordPlaybackScreen(Game game) {
 		super(game);
@@ -56,6 +58,8 @@ public class SimpleRecordPlaybackScreen extends AbstractScreen {
 		playback.getStyle().font.setScale(2);
 		dropRecord.getStyle().font.setScale(2);
 
+		visualizer = new InputVisualizer();
+
 		layout();
 	}
 
@@ -66,8 +70,11 @@ public class SimpleRecordPlaybackScreen extends AbstractScreen {
 			break;
 		}
 		case BEFORE_RECORD: {
+			Cell<?> visualizerCell = table.add(visualizer);
+			visualizerCell.width(800).height(600).left().expandY();
+
 			Cell<?> recordCell = table.add(record);
-			recordCell.width(200).height(300).right().expandY().expandX();
+			recordCell.width(200).height(300).right().expandY();
 			break;
 		}
 		case PLAYBACK:

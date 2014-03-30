@@ -1,4 +1,4 @@
-package com.badlogic.demos.inputrecorder;
+package com.badlogic.demos.automation;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;

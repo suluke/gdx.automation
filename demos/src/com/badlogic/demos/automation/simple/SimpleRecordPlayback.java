@@ -1,6 +1,6 @@
-package com.badlogic.demos.inputrecorder.simple;
+package com.badlogic.demos.automation.simple;
 
-import com.badlogic.demos.inputrecorder.Game;
+import com.badlogic.demos.automation.Game;
 
 public class SimpleRecordPlayback extends Game {
 

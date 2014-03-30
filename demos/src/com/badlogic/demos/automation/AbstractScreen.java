@@ -1,4 +1,4 @@
-package com.badlogic.demos.inputrecorder;
+package com.badlogic.demos.automation;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -93,6 +93,7 @@ public abstract class AbstractScreen implements Screen {
 
 		stage.act(delta);
 		stage.draw();
+		Table.drawDebug(stage);
 	}
 
 	public void setBackground(String backgroundPath) {
