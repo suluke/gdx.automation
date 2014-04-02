@@ -1,4 +1,6 @@
-# Input recorder and playback for libGDX
+# gdx.automation
+### Input recorder and playback for libGDX
+
 ## Introduction
 User input is a powerful concept.  
 Most developers just take user input interfaces as granted and intuitionally build their applications to respond to them.
@@ -66,21 +68,26 @@ See the demos folder and the eclipse project within for code in action:
   * e.g. specify regions that still listen to current device events, so an onscreen button can stop a playback.
     This would be great for tutorials.
 * implement callbacks 
-  * on replay finished, so e.g. a tutorial will automatically be replayed
+  * ~~on replay finished, so e.g. a tutorial will automatically be replayed~~ CHECK!
   * on certain input events, so they can be visualized
 * Implement an android style monkey tool
 
 ## Not supported
 * Recording of software triggered input capabilities like 
-  * catching back key on android
-  * catch menu key on android
-  * catching cursor on desktop and saving its success (getCursorCatched)
+  * catching `back key` on android
+  * catch `menu key` on android
+  * catching cursor on desktop and saving the success of `getCursorCatched`
   * setting the cursor 
   * making the software keyboard visible
   
-  This simply should not be necessary to be recorded, as recordings are supposed to record what input influences the program flow.
-  Not how the program flow influences the input.
+  This simply should not be necessary to be recorded, as recordings are supposed to record what input influences the program flow, not how the program flow influences the input.
   Although, I guess, it wouldn't be too hard to record them.
+
+## Contributing
+I would be happy to receive any pull requests with improvements.
+Note that I am more likely to accept contributions that comply with the [libGdx contribution guidelines](https://github.com/libgdx/libgdx/wiki/Contributing), though.  
+Regarding the Contributor License Agreement, I will not demand it for smaller contributions (e.g. fixing a bug, adding new features that are non-essential for the whole project).
+However, if someone comes an asks me to replace huge parts of already existing code with his own, I will probably insist on a written assurance that he won't revoke his consent for his code being used in gdx-automation later.
 
 ## Licensing
 Copyright 2014 Lukas Böhm
