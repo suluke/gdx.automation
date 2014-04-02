@@ -16,6 +16,9 @@ abstract class InputProcessorProxy implements InputProcessor {
 	}
 
 	public void setProxied(InputProcessor proxied) {
+		if (proxied == this) {
+			throw new IllegalArgumentException("Proxy must not proxy itself");
+		}
 		this.proxied = proxied;
 	}
 

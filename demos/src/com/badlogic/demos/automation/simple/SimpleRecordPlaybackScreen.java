@@ -1,9 +1,16 @@
 package com.badlogic.demos.automation.simple;
 
+import java.io.IOException;
+
 import com.badlogic.demos.automation.AbstractScreen;
 import com.badlogic.demos.automation.Game;
 import com.badlogic.demos.automation.InputVisualizer;
 import com.badlogic.demos.automation.StyleHelper;
+import com.badlogic.gdx.automation.recorder.InputRecordPlayer;
+import com.badlogic.gdx.automation.recorder.InputRecorder;
+import com.badlogic.gdx.automation.recorder.InputRecorderConfiguration;
+import com.badlogic.gdx.automation.recorder.PlaybackAdapter;
+import com.badlogic.gdx.automation.recorder.formats.MemoryInputRecordWriter;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -12,6 +19,9 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.esotericsoftware.tablelayout.Cell;
 
 public class SimpleRecordPlaybackScreen extends AbstractScreen {
+
+	private final InputRecorder recorder;
+	private final MemoryInputRecordWriter writer;
 
 	private enum State {
 		/**
@@ -42,14 +52,23 @@ public class SimpleRecordPlaybackScreen extends AbstractScreen {
 
 	public SimpleRecordPlaybackScreen(Game game) {
 		super(game);
+		InputRecorderConfiguration config = new InputRecorderConfiguration();
+		writer = new MemoryInputRecordWriter();
+		config.writer = writer;
+		recorder = new InputRecorder(config);
 
 		record = new TextButton("Record", new TextButtonStyle(StyleHelper
 				.getInstance().getTextButtonStyle()));
+		record.addListener(new StartRecordListener());
+
 		stopRecord = new TextButton("Stop", new TextButtonStyle(StyleHelper
 				.getInstance().getTextButtonStyle()));
-		record.addListener(new PlayPauseListener());
+		stopRecord.addListener(new StopRecordListener());
+
 		playback = new TextButton("Play back", new TextButtonStyle(StyleHelper
 				.getInstance().getTextButtonStyle()));
+		playback.addListener(new StartPlaybackListener());
+
 		dropRecord = new TextButton("Drop recorded", new TextButtonStyle(
 				StyleHelper.getInstance().getTextButtonStyle()));
 
@@ -67,6 +86,11 @@ public class SimpleRecordPlaybackScreen extends AbstractScreen {
 		table.clear();
 		switch (currentState) {
 		case AFTER_RECORD: {
+			Cell<?> visualizerCell = table.add(visualizer);
+			visualizerCell.width(800).height(600).left().expandY();
+
+			Cell<?> playCell = table.add(playback);
+			playCell.width(200).height(300).right().expandY();
 			break;
 		}
 		case BEFORE_RECORD: {
@@ -77,27 +101,74 @@ public class SimpleRecordPlaybackScreen extends AbstractScreen {
 			recordCell.width(200).height(300).right().expandY();
 			break;
 		}
-		case PLAYBACK:
+		case PLAYBACK: {
+			Cell<?> visualizerCell = table.add(visualizer);
+			visualizerCell.width(800).height(600).left().expandY();
 			break;
+		}
 		case RECORDING: {
+			Cell<?> visualizerCell = table.add(visualizer);
+			visualizerCell.width(800).height(600).left().expandY();
+
+			Cell<?> stopCell = table.add(stopRecord);
+			stopCell.width(200).height(300).right().expandY();
 			break;
 		}
 		default:
-			break;
-
+			throw new IllegalStateException();
 		}
 	}
 
-	private class PlayPauseListener implements EventListener {
+	private class StartRecordListener implements EventListener {
 
 		@Override
 		public boolean handle(Event event) {
 			if (event instanceof ChangeEvent) {
 				currentState = State.RECORDING;
 				layout();
+				try {
+					recorder.startRecording();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
-			return false;
+			return true;
 		}
 	}
 
+	private class StopRecordListener implements EventListener {
+		@Override
+		public boolean handle(Event event) {
+			if (event instanceof ChangeEvent) {
+				currentState = State.AFTER_RECORD;
+				try {
+					recorder.stopRecording();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				layout();
+			}
+			return true;
+		}
+	}
+
+	private class StartPlaybackListener implements EventListener {
+		@Override
+		public boolean handle(Event event) {
+			if (event instanceof ChangeEvent) {
+				currentState = State.PLAYBACK;
+				InputRecordPlayer player = new InputRecordPlayer(
+						writer.getReader());
+				player.addPlaybackListener(new PlaybackAdapter() {
+					@Override
+					public void onFinish() {
+						currentState = State.BEFORE_RECORD;
+						layout();
+					}
+				});
+				layout();
+			}
+			return true;
+		}
+	}
 }

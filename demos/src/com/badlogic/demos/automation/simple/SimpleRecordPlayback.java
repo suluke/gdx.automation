@@ -13,7 +13,12 @@ public class SimpleRecordPlayback extends Game {
 	}
 
 	public static void main(String[] args) {
-		startDemo(new SimpleRecordPlayback());
+		try {
+			startDemo(new SimpleRecordPlayback());
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			System.exit(1);
+		}
 	}
 
 }

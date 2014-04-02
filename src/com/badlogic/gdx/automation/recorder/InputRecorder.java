@@ -3,9 +3,9 @@ package com.badlogic.gdx.automation.recorder;
 import java.io.IOException;
 
 import com.badlogic.gdx.Files.FileType;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.automation.recorder.formats.InputRecordWriter;
 import com.badlogic.gdx.automation.recorder.formats.JsonInputRecordWriter;
-import com.badlogic.gdx.Gdx;
 
 /**
  * The main class for input recording in a libGDX application.
@@ -15,7 +15,6 @@ public class InputRecorder {
 
 	private final InputStateTracker valueTracker;
 	private final TextInputTracker textTracker;
-	private InputRecordWriter writer;
 
 	private final InputRecorderConfiguration config;
 
@@ -44,7 +43,7 @@ public class InputRecorder {
 						standardOutputLocation);
 			}
 			try {
-				writer = new JsonInputRecordWriter(config.outputFile);
+				config.writer = new JsonInputRecordWriter(config.outputFile);
 			} catch (IOException e) {
 				throw new IllegalStateException(
 						"Unable to create InputRecordWriter for file "
@@ -54,8 +53,8 @@ public class InputRecorder {
 	}
 
 	public void startRecording() throws IOException {
-		writer.open();
-		writer.writeStaticValues(InputValue.getCurrentStaticValues());
+		config.writer.open();
+		config.writer.writeStaticValues(InputValue.getCurrentStaticValues());
 		textTracker.startTracking();
 		valueTracker.startTracking();
 	}
@@ -63,21 +62,21 @@ public class InputRecorder {
 	public void stopRecording() throws IOException {
 		textTracker.stopTracking();
 		valueTracker.startTracking();
-		writer.close();
+		config.writer.close();
 	}
 
 	public void flush() throws IOException {
-		writer.flush();
+		config.writer.flush();
 	}
 
-	public synchronized void setInputSequenceWriter(InputRecordWriter writer) {
+	public synchronized void setInputRecordWriter(InputRecordWriter writer) {
 		boolean textTrackerRunning = textTracker.isTracking();
 		boolean stateTrackerRunning = valueTracker.isTracking();
 
 		textTracker.stopTracking();
 		valueTracker.stopTracking();
 
-		synchronized (this.writer) {
+		synchronized (config.writer) {
 			try {
 				flush();
 			} catch (IOException e) {
@@ -85,7 +84,7 @@ public class InputRecorder {
 				Gdx.app.log(LOG_TAG,
 						"Probable loss of recorded data (see exception trace)");
 			}
-			this.writer = writer;
+			config.writer = writer;
 		}
 
 		if (textTrackerRunning) {
@@ -97,9 +96,7 @@ public class InputRecorder {
 	}
 
 	InputRecordWriter getRecordWriter() {
-		synchronized (writer) {
-			return writer;
-		}
+		return config.writer;
 	}
 
 	InputRecorderConfiguration getConfiguration() {
