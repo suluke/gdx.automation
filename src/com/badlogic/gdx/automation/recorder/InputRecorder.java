@@ -1,6 +1,7 @@
 package com.badlogic.gdx.automation.recorder;
 
 import java.io.IOException;
+import java.lang.reflect.UndeclaredThrowableException;
 
 import com.badlogic.gdx.Files.FileType;
 import com.badlogic.gdx.Gdx;
@@ -61,7 +62,7 @@ public class InputRecorder {
 
 	public void stopRecording() throws IOException {
 		textTracker.stopTracking();
-		valueTracker.startTracking();
+		valueTracker.stopTracking();
 		config.writer.close();
 	}
 
@@ -101,5 +102,9 @@ public class InputRecorder {
 
 	InputRecorderConfiguration getConfiguration() {
 		return config;
+	}
+
+	void notifyError(Throwable cause) {
+		throw new UndeclaredThrowableException(cause);
 	}
 }

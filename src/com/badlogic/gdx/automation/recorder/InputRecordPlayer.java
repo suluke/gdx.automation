@@ -21,8 +21,10 @@ public class InputRecordPlayer {
 	}
 
 	public void startPlayback() {
-		playback.setProxiedInput(Gdx.input);
-		Gdx.input = playback;
+		synchronized (Gdx.input) {
+			playback.setProxiedInput(Gdx.input);
+			Gdx.input = playback;
+		}
 		notifyStart();
 	}
 

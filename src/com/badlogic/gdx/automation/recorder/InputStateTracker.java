@@ -74,16 +74,27 @@ class InputStateTracker {
 	}
 
 	public synchronized void startTracking() {
-		stopTracking();
+		if (isTracking()) {
+			Gdx.app.log(InputRecorder.LOG_TAG,
+					"Starting InputStateTracker more than once");
+			return;
+		}
 		tracking = true;
 		tracker.start();
 		processor.start();
-		grabberKeeper.setProxiedInput(Gdx.input);
-		Gdx.input = grabberKeeper;
+		synchronized (Gdx.input) {
+			grabberKeeper.setProxiedInput(Gdx.input);
+			Gdx.input = grabberKeeper;
+		}
 		grabberArmer.start();
 	}
 
 	public synchronized void stopTracking() {
+		if (!isTracking()) {
+			Gdx.app.log(InputRecorder.LOG_TAG,
+					"Stopping InputStateTracker more than once");
+			return;
+		}
 		processor.stop();
 		grabberArmer.stop();
 		tracker.stop();
@@ -121,8 +132,10 @@ class InputStateTracker {
 		@Override
 		public void setProxiedInput(Input proxied) {
 			super.setProxiedInput(proxied);
-			grabber.setProxied(proxied.getInputProcessor());
-			proxied.setInputProcessor(grabber);
+			if (proxied.getInputProcessor() != grabber) {
+				grabber.setProxied(proxied.getInputProcessor());
+				proxied.setInputProcessor(grabber);
+			}
 		}
 
 		@Override
@@ -193,16 +206,33 @@ class InputStateTracker {
 			processor = new InputStateProcessor(recorder);
 		}
 
-		public synchronized void start() {
-			stop();
-			processorThread = new Thread(this);
-			processorThread.setDaemon(true);
-			processorThread.start();
+		public void start() {
+			if (processorThread != null) {
+				if (processorThread.isAlive()) {
+					return;
+				}
+				synchronized (processorThread) {
+					processorThread = new Thread(this);
+					processorThread.setDaemon(true);
+					processorThread.start();
+				}
+			} else {
+				processorThread = new Thread(this);
+				processorThread.setDaemon(true);
+				processorThread.start();
+			}
 		}
 
-		public synchronized void stop() {
+		public void stop() {
 			if (processorThread != null && processorThread.isAlive()) {
-				processorThread.interrupt();
+				synchronized (processorThread) {
+					processorThread.interrupt();
+					try {
+						processorThread.join();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
 			}
 		}
 
@@ -221,17 +251,7 @@ class InputStateTracker {
 				try {
 					processor.process(state);
 				} catch (IOException e) {
-					// TODO the error handling should get some
-					// reconsideration...
-					e.printStackTrace();
-					try {
-						recorder.stopRecording();
-					} catch (IOException ex) {
-						ex.printStackTrace();
-						// Something is seriously wrong, the whole system is
-						// wrecked
-						System.exit(1);
-					}
+					recorder.notifyError(e);
 				}
 				statePool.free(state);
 			}

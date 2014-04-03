@@ -241,14 +241,16 @@ abstract class InputProxy implements Input {
 			return false;
 		}
 		if (Gdx.input.equals(proxy)) {
-			Gdx.input = proxy.getProxiedInput();
+			synchronized (Gdx.input) {
+				Gdx.input = proxy.getProxiedInput();
+			}
 			return true;
 		}
 		Input current = Gdx.input;
 		InputProxy asProxy;
 		while (current != null && current instanceof InputProxy) {
 			asProxy = (InputProxy) current;
-			if (asProxy.getProxiedInput().equals(proxy)) {
+			if (asProxy.getProxiedInput() == proxy) {
 				asProxy.setProxiedInput(proxy.getProxiedInput());
 				return true;
 			}

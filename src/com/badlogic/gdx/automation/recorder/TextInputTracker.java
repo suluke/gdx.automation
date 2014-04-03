@@ -22,9 +22,30 @@ class TextInputTracker extends InputProxy {
 	}
 
 	public synchronized void startTracking() {
-		setProxiedInput(getTrackedInput());
-		Gdx.input = this;
+		if (isTracking()) {
+			Gdx.app.log(InputRecorder.LOG_TAG,
+					"Starting TextInputTracker more than once");
+			return;
+		}
+		synchronized (Gdx.input) {
+			setProxiedInput(getTrackedInput());
+			Gdx.input = this;
+		}
 		running = true;
+	}
+
+	public synchronized void stopTracking() {
+		if (!isTracking()) {
+			Gdx.app.log(InputRecorder.LOG_TAG,
+					"Stopping TextInputTracker more than once");
+			return;
+		}
+		if (!InputProxy.removeProxyFromGdx(this)) {
+			Gdx.app.log(InputRecorder.LOG_TAG,
+					"Cannot unregister TextInputTracker");
+			throw new IllegalStateException();
+		}
+		running = false;
 	}
 
 	private Input getTrackedInput() {
@@ -42,14 +63,6 @@ class TextInputTracker extends InputProxy {
 		} else {
 			return Gdx.input;
 		}
-	}
-
-	public synchronized void stopTracking() {
-		if (!InputProxy.removeProxyFromGdx(this)) {
-			Gdx.app.log(InputRecorder.LOG_TAG,
-					"Cannot unregister TextInputTracker");
-		}
-		running = false;
 	}
 
 	@Override
@@ -70,14 +83,7 @@ class TextInputTracker extends InputProxy {
 		try {
 			recorder.getRecordWriter().writeAsyncValues(new Text(text));
 		} catch (IOException e) {
-			// TODO the error handling should get some reconsideration...
-			e.printStackTrace();
-			try {
-				recorder.stopRecording();
-			} catch (IOException ex) {
-				ex.printStackTrace();
-				System.exit(1);
-			}
+			recorder.notifyError(e);
 		}
 	}
 
@@ -87,12 +93,7 @@ class TextInputTracker extends InputProxy {
 		} catch (IOException e) {
 			// TODO the error handling should get some reconsideration...
 			e.printStackTrace();
-			try {
-				recorder.stopRecording();
-			} catch (IOException ex) {
-				ex.printStackTrace();
-				System.exit(1);
-			}
+			recorder.notifyError(e);
 		}
 	}
 
@@ -101,14 +102,7 @@ class TextInputTracker extends InputProxy {
 			recorder.getRecordWriter().writeAsyncValues(
 					new PlaceholderText(text));
 		} catch (IOException e) {
-			// TODO the error handling should get some reconsideration...
-			e.printStackTrace();
-			try {
-				recorder.stopRecording();
-			} catch (IOException ex) {
-				ex.printStackTrace();
-				System.exit(1);
-			}
+			recorder.notifyError(e);
 		}
 	}
 
@@ -117,14 +111,7 @@ class TextInputTracker extends InputProxy {
 			recorder.getRecordWriter().writeAsyncValues(
 					new PlaceholderText(null));
 		} catch (IOException e) {
-			// TODO the error handling should get some reconsideration...
-			e.printStackTrace();
-			try {
-				recorder.stopRecording();
-			} catch (IOException ex) {
-				ex.printStackTrace();
-				System.exit(1);
-			}
+			recorder.notifyError(e);
 		}
 	}
 
