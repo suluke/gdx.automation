@@ -11,6 +11,7 @@ import com.badlogic.gdx.automation.recorder.formats.JsonInputRecordWriter;
 /**
  * The main class for input recording in a libGDX application.
  * 
+ * @author Lukas Böhm
  */
 public class InputRecorder {
 

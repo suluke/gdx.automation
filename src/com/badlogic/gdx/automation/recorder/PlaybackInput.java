@@ -16,6 +16,7 @@ import com.badlogic.gdx.graphics.Pixmap;
  * A simple implementation of the {@link Input} interface, designed to simply
  * play back what is stored in an enclosed {@link InputState}
  * 
+ * @author Lukas Böhm
  */
 class PlaybackInput extends InputProxy {
 

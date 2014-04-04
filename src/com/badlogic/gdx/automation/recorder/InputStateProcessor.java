@@ -16,6 +16,7 @@ import com.badlogic.gdx.automation.recorder.formats.InputRecordWriter;
  * A class to be fed InputStates via {@link #process(InputState)} so it can
  * process them and write it using {@link InputRecorder#getRecordWriter()}
  * 
+ * @author Lukas Böhm
  */
 class InputStateProcessor {
 	private final InputRecorder recorder;
@@ -50,6 +51,12 @@ class InputStateProcessor {
 			flags |= Type.POINTER_EVENTS.key;
 		}
 		trackedValuesFlag = flags;
+	}
+
+	private long getTimeDelta() {
+		long delta = timeDelta;
+		timeDelta = 0;
+		return delta;
 	}
 
 	/**
@@ -95,7 +102,7 @@ class InputStateProcessor {
 			buttonChange.button0 = state.button0;
 			buttonChange.button1 = state.button1;
 			buttonChange.button2 = state.button2;
-			buttonChange.timeDelta = this.timeDelta;
+			buttonChange.timeDelta = getTimeDelta();
 			recorder.getRecordWriter().writeSyncValues(buttonChange);
 		}
 	}
@@ -105,7 +112,7 @@ class InputStateProcessor {
 		for (KeyEvent event : state.keyEvents) {
 			com.badlogic.gdx.automation.recorder.InputValue.SyncValue.KeyEvent valueEvent = new com.badlogic.gdx.automation.recorder.InputValue.SyncValue.KeyEvent(
 					event);
-			valueEvent.timeDelta = timeDelta;
+			valueEvent.timeDelta = getTimeDelta();
 			writer.writeSyncValues(valueEvent);
 		}
 	}
@@ -115,7 +122,7 @@ class InputStateProcessor {
 		for (int key : state.pressedKeys.keySet()) {
 			KeyPressed pressed = new KeyPressed();
 			pressed.keyCode = key;
-			pressed.timeDelta = timeDelta;
+			pressed.timeDelta = getTimeDelta();
 			writer.writeSyncValues(pressed);
 		}
 	}
@@ -129,7 +136,7 @@ class InputStateProcessor {
 			accelChange.accelerometerX = state.accelerometerX;
 			accelChange.accelerometerY = state.accelerometerY;
 			accelChange.accelerometerZ = state.accelerometerZ;
-			accelChange.timeDelta = timeDelta;
+			accelChange.timeDelta = getTimeDelta();
 		}
 		if (lastState == null || state.roll != lastState.roll
 				|| state.pitch != lastState.pitch
@@ -142,7 +149,7 @@ class InputStateProcessor {
 			oChange.orientation = state.orientation;
 			System.arraycopy(state.rotationMatrix, 0, oChange.rotationMatrix,
 					0, 16);
-			oChange.timeDelta = timeDelta;
+			oChange.timeDelta = getTimeDelta();
 		}
 	}
 
@@ -160,7 +167,7 @@ class InputStateProcessor {
 				ptrChange.deltaX = state.deltaX[i];
 				ptrChange.deltaY = state.deltaY[i];
 				ptrChange.pointer = i;
-				ptrChange.timeDelta = this.timeDelta;
+				ptrChange.timeDelta = getTimeDelta();
 				writer.writeSyncValues(ptrChange);
 			}
 		}
@@ -171,7 +178,7 @@ class InputStateProcessor {
 		for (PointerEvent event : state.pointerEvents) {
 			com.badlogic.gdx.automation.recorder.InputValue.SyncValue.PointerEvent ptrEvent = new com.badlogic.gdx.automation.recorder.InputValue.SyncValue.PointerEvent(
 					event);
-			ptrEvent.timeDelta = timeDelta;
+			ptrEvent.timeDelta = getTimeDelta();
 			writer.writeSyncValues(ptrEvent);
 		}
 	}

@@ -11,6 +11,13 @@ import com.badlogic.gdx.automation.recorder.formats.InputRecordWriter;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.ReflectionPool;
 
+/**
+ * Submodule of {@link InputRecorder} responsible for recording
+ * {@link InputValue.SyncValue}s
+ * 
+ * @author Lukas Böhm
+ * 
+ */
 class InputStateTracker {
 
 	private final InputRecorder recorder;

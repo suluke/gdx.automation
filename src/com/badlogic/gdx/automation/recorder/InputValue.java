@@ -20,12 +20,28 @@ import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.PointerEvent;
  * them "structs" in C) they are not declared in their own files but as inner
  * classes of this class.
  * 
+ * @author Lukas Böhm
  */
 public abstract class InputValue {
 	private InputValue() {
 	}
 
+	/**
+	 * 
+	 * @author Lukas Böhm
+	 * 
+	 */
 	public static abstract class SyncValue {
+		/**
+		 * Enum helping to create the selection flags used by some methods like
+		 * {@link InputState#set(InputState, int)}. By providing a
+		 * {@link Type#key key} that needs to be OR'ed together only the
+		 * corresponding {@link SyncValue}s will be considered in such a
+		 * process.
+		 * 
+		 * @author Lukas Böhm
+		 * 
+		 */
 		public enum Type {
 			POINTERS(1), BUTTONS(2), POINTER_EVENTS(4), KEY_EVENTS(8), KEYS_PRESSED(
 					16), ORIENTATION(32);
@@ -42,6 +58,15 @@ public abstract class InputValue {
 			}
 		}
 
+		/**
+		 * Method to accept {@link SyncValueVisitor}s, so that concrete child
+		 * classes of {@link SyncValue} can execute child-specific code of the
+		 * concrete visitor implementation. This is great to omit
+		 * <code>instancof</code> or <code>getClass()</code> by having the jvm
+		 * doing the dispatching
+		 * 
+		 * @param visitor
+		 */
 		public abstract void accept(SyncValueVisitor visitor);
 
 		/**
@@ -49,6 +74,11 @@ public abstract class InputValue {
 		 */
 		public long timeDelta;
 
+		/**
+		 * 
+		 * @author Lukas Böhm
+		 * 
+		 */
 		public static class Accelerometer extends SyncValue {
 			public float accelerometerX;
 			public float accelerometerY;
@@ -60,6 +90,11 @@ public abstract class InputValue {
 			}
 		}
 
+		/**
+		 * 
+		 * @author Lukas Böhm
+		 * 
+		 */
 		public static class Orientation extends SyncValue {
 			public float roll;
 			public float pitch;
@@ -74,6 +109,11 @@ public abstract class InputValue {
 
 		}
 
+		/**
+		 * 
+		 * @author Lukas Böhm
+		 * 
+		 */
 		public static class KeyPressed extends SyncValue {
 
 			public int keyCode;
@@ -85,6 +125,11 @@ public abstract class InputValue {
 
 		}
 
+		/**
+		 * 
+		 * @author Lukas Böhm
+		 * 
+		 */
 		public static class KeyEvent extends SyncValue {
 			public KeyState type;
 			public int keyCode;
@@ -103,6 +148,11 @@ public abstract class InputValue {
 			}
 		}
 
+		/**
+		 * 
+		 * @author Lukas Böhm
+		 * 
+		 */
 		public static class PointerEvent extends SyncValue {
 			public PointerState type;
 			public int x;
@@ -127,6 +177,11 @@ public abstract class InputValue {
 			}
 		}
 
+		/**
+		 * 
+		 * @author Lukas Böhm
+		 * 
+		 */
 		public static class Pointer extends SyncValue {
 			public int pointer;
 			public int x;
@@ -140,6 +195,11 @@ public abstract class InputValue {
 			}
 		}
 
+		/**
+		 * 
+		 * @author Lukas Böhm
+		 * 
+		 */
 		public static class Button extends SyncValue {
 			public boolean button0;
 			public boolean button1;
@@ -178,7 +238,21 @@ public abstract class InputValue {
 		void visitButton(Button button);
 	}
 
+	/**
+	 * 
+	 * @author Lukas Böhm
+	 * 
+	 */
 	public static abstract class AsyncValue {
+		/**
+		 * Method to accept {@link AsyncValueVisitor}s, so that concrete child
+		 * classes of {@link AsyncValue} can execute child-specific code of the
+		 * concrete visitor implementation. This is great to omit
+		 * <code>instancof</code> or <code>getClass()</code> by having the jvm
+		 * doing the dispatching
+		 * 
+		 * @param visitor
+		 */
 		public abstract void accept(AsyncValueVisitor visitor);
 
 		public static class Text extends AsyncValue {
@@ -231,6 +305,13 @@ public abstract class InputValue {
 		void visitPlaceholderText(PlaceholderText text);
 	}
 
+	/**
+	 * A struct to aggregate all properties that a libGdx environment can
+	 * exhibit.
+	 * 
+	 * @author Lukas Böhm
+	 * 
+	 */
 	public static class StaticValues extends InputValue {
 		public boolean accelerometerAvailable;
 		public boolean compassAvailable;
@@ -251,6 +332,12 @@ public abstract class InputValue {
 		}
 	}
 
+	/**
+	 * Copies the {@link StaticValues} from the current {@link Gdx libGdx}
+	 * environment.
+	 * 
+	 * @return the {@link StaticValues} of the current environment
+	 */
 	public static StaticValues getCurrentStaticValues() {
 		StaticValues result = new StaticValues();
 		result.accelerometerAvailable = Gdx.input

@@ -7,6 +7,7 @@ import com.badlogic.gdx.files.FileHandle;
 /**
  * A class to configure new instances of {@link InputRecorder}
  * 
+ * @author Lukas Böhm
  */
 public class InputRecorderConfiguration {
 	/**

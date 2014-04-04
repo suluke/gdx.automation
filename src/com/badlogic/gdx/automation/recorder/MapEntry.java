@@ -1,9 +1,14 @@
 package com.badlogic.gdx.automation.recorder;
 
+import java.util.Map;
+
 /**
+ * Generic implementation of {@link Map.Entry} used in {@link SparseArray}
  * 
  * @param <K>
  * @param <V>
+ * 
+ * @author Lukas Böhm
  */
 class MapEntry<K, V> implements java.util.Map.Entry<K, V> {
 

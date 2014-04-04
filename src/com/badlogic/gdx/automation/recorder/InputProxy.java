@@ -5,6 +5,11 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Pixmap;
 
+/**
+ * 
+ * @author Lukas Böhm
+ * 
+ */
 abstract class InputProxy implements Input {
 
 	protected Input input;

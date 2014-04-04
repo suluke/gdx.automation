@@ -16,6 +16,7 @@ import com.badlogic.gdx.utils.TimeUtils;
  * time. Especially the {@link #set(InputState, int)} method is useful to take a
  * snapshot of a configurable set of properties from a given {@link Input}
  * 
+ * @author Lukas Böhm
  */
 public class InputState {
 

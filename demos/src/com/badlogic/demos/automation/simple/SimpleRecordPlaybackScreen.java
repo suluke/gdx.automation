@@ -161,7 +161,7 @@ public class SimpleRecordPlaybackScreen extends AbstractScreen {
 						writer.getReader());
 				player.addPlaybackListener(new PlaybackAdapter() {
 					@Override
-					public void onFinish() {
+					public void onSynchronousFinish() {
 						currentState = State.BEFORE_RECORD;
 						layout();
 					}

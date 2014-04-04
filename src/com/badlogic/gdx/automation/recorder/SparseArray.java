@@ -13,6 +13,20 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+/**
+ * 
+ * Dynamically growing array optimized for the following:
+ * <ul>
+ * <li>"Fill once, access multiple times" usage</li>
+ * <li>Little memory usage if only few places in the array are used</li>
+ * <li>Insert in O(log(n)) if filled randomly or O(1) if filled sequentially</li>
+ * <li>Access in O(log(n)) if accessed randomly</li>
+ * </ul>
+ * 
+ * @author Lukas Böhm
+ * 
+ * @param <T>
+ */
 class SparseArray<T> implements Map<Integer, T>, Iterable<T> {
 	private final MapEntry<Integer, T> finder;
 	private final Comparator<Map.Entry<Integer, T>> comp;

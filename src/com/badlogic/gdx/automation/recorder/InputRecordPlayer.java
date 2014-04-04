@@ -9,6 +9,7 @@ import com.badlogic.gdx.automation.recorder.formats.InputRecordReader;
 /**
  * Standard implementation of a player playing back recorded or generated input.
  * 
+ * @author Lukas Böhm
  */
 public class InputRecordPlayer {
 	private final PlaybackInput playback;
@@ -79,7 +80,7 @@ public class InputRecordPlayer {
 
 	private void notifyFinished() {
 		for (PlaybackListener listener : listeners) {
-			listener.onFinish();
+			listener.onSynchronousFinish();
 		}
 	}
 }

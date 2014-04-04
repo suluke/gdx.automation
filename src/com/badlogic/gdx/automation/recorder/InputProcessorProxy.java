@@ -3,6 +3,11 @@ package com.badlogic.gdx.automation.recorder;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 
+/**
+ * 
+ * @author Lukas Böhm
+ * 
+ */
 abstract class InputProcessorProxy implements InputProcessor {
 
 	private InputProcessor proxied;

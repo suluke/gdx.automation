@@ -8,8 +8,12 @@ import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.PlaceholderTex
 import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.Text;
 
 /**
+ * Submodule of {@link InputRecorder} responsible for intercepting asynchronous
+ * input, like for example
+ * {@link Input#getTextInput(com.badlogic.gdx.Input.TextInputListener, String, String)
+ * getText}
  * 
- *
+ * @author Lukas Böhm
  */
 class TextInputTracker extends InputProxy {
 
