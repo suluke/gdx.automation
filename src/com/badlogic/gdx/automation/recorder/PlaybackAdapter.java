@@ -21,9 +21,4 @@ public class PlaybackAdapter implements PlaybackListener {
 	@Override
 	public void onStop() {
 	}
-
-	@Override
-	public void onPause() {
-	}
-
 }

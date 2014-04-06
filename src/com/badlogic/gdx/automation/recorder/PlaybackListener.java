@@ -3,8 +3,8 @@ package com.badlogic.gdx.automation.recorder;
 import com.badlogic.gdx.automation.recorder.formats.InputRecordReader;
 
 /**
- * Listener interface for providing callbacks to an {@link InputRecordPlayer}
- * for getting notified on various occasions during a playback
+ * Listener interface for providing callbacks to an {@link InputPlayer} for
+ * getting notified on various occasions during a playback
  * 
  * @author Lukas Böhm
  * 
@@ -20,6 +20,4 @@ public interface PlaybackListener {
 	void onSynchronousFinish();
 
 	void onStop();
-
-	void onPause();
 }

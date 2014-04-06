@@ -6,16 +6,18 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Pixmap;
 
 /**
+ * Wraps a concrete instance of {@link Input} and proxies all its methods. If
+ * the proxied instance is null, the return values of most methods will indicate
+ * that features are not available (by returning false or negative values if
+ * only positive is expected) or simply return that nothing has happened.
  * 
  * @author Lukas Böhm
- * 
  */
 abstract class InputProxy implements Input {
 
 	protected Input input;
 
 	public InputProxy(Input proxied) {
-		testNullProxied(proxied);
 		this.input = proxied;
 	}
 
@@ -24,7 +26,6 @@ abstract class InputProxy implements Input {
 	}
 
 	public void setProxiedInput(Input proxied) {
-		testNullProxied(proxied);
 		this.input = proxied;
 	}
 
@@ -32,134 +33,214 @@ abstract class InputProxy implements Input {
 		return input;
 	}
 
-	private void testNullProxied(Input proxied) {
-		if (proxied == null) {
-			throw new IllegalArgumentException("Cannot proxy null as Input");
+	@Override
+	public float getAccelerometerX() {
+		if (input != null) {
+			return input.getAccelerometerX();
+		} else {
+			return 0;
 		}
 	}
 
 	@Override
-	public float getAccelerometerX() {
-		return input.getAccelerometerX();
-	}
-
-	@Override
 	public float getAccelerometerY() {
-		return input.getAccelerometerY();
+		if (input != null) {
+			return input.getAccelerometerY();
+		} else {
+			return 0;
+		}
 	}
 
 	@Override
 	public float getAccelerometerZ() {
-		return input.getAccelerometerZ();
+		if (input != null) {
+			return input.getAccelerometerZ();
+		} else {
+			return 0;
+		}
 	}
 
 	@Override
 	public int getX() {
-		return input.getX();
+		if (input != null) {
+			return input.getX();
+		} else {
+			return -1;
+		}
 	}
 
 	@Override
 	public int getX(int pointer) {
-		return input.getX(pointer);
+		if (input != null) {
+			return input.getX(pointer);
+		} else {
+			return -1;
+		}
 	}
 
 	@Override
 	public int getDeltaX() {
-		return input.getDeltaX();
+		if (input != null) {
+			return input.getDeltaX();
+		} else {
+			return -1;
+		}
 	}
 
 	@Override
 	public int getDeltaX(int pointer) {
-		return input.getDeltaX(pointer);
+		if (input != null) {
+			return input.getDeltaX(pointer);
+		} else {
+			return -1;
+		}
 	}
 
 	@Override
 	public int getY() {
-		return input.getY();
+		if (input != null) {
+			return input.getY();
+		} else {
+			return -1;
+		}
 	}
 
 	@Override
 	public int getY(int pointer) {
-		return input.getY(pointer);
+		if (input != null) {
+			return input.getY(pointer);
+		} else {
+			return -1;
+		}
 	}
 
 	@Override
 	public int getDeltaY() {
-		return input.getDeltaY();
+		if (input != null) {
+			return input.getDeltaY();
+		} else {
+			return -1;
+		}
 	}
 
 	@Override
 	public int getDeltaY(int pointer) {
-		return input.getDeltaY(pointer);
+		if (input != null) {
+			return input.getDeltaY(pointer);
+		} else {
+			return -1;
+		}
 	}
 
 	@Override
 	public boolean isTouched() {
-		return input.isTouched();
+		if (input != null) {
+			return input.isTouched();
+		} else {
+			return false;
+		}
 	}
 
 	@Override
 	public boolean justTouched() {
-		return input.justTouched();
+		if (input != null) {
+			return input.justTouched();
+		} else {
+			return false;
+		}
 	}
 
 	@Override
 	public boolean isTouched(int pointer) {
-		return input.isTouched(pointer);
+		if (input != null) {
+			return input.isTouched(pointer);
+		} else {
+			return false;
+		}
 	}
 
 	@Override
 	public boolean isButtonPressed(int button) {
-		return input.isButtonPressed(button);
+		if (input != null) {
+			return input.isButtonPressed(button);
+		} else {
+			return false;
+		}
 	}
 
 	@Override
 	public boolean isKeyPressed(int key) {
-		return input.isKeyPressed(key);
+		if (input != null) {
+			return input.isKeyPressed(key);
+		} else {
+			return false;
+		}
 	}
 
 	@Override
 	public void getTextInput(TextInputListener listener, String title,
 			String text) {
-		// TODO Auto-generated method stub
-
+		if (input != null) {
+			input.getTextInput(listener, title, text);
+		} else {
+			listener.canceled();
+		}
 	}
 
 	@Override
 	public void getPlaceholderTextInput(TextInputListener listener,
 			String title, String placeholder) {
-		// TODO Auto-generated method stub
-
+		if (input != null) {
+			input.getPlaceholderTextInput(listener, title, placeholder);
+		} else {
+			listener.canceled();
+		}
 	}
 
 	@Override
 	public void setOnscreenKeyboardVisible(boolean visible) {
-		input.setOnscreenKeyboardVisible(visible);
+		if (input != null) {
+			input.setOnscreenKeyboardVisible(visible);
+		}
 	}
 
 	@Override
 	public void vibrate(int milliseconds) {
-		input.vibrate(milliseconds);
+		if (input != null) {
+			input.vibrate(milliseconds);
+		}
 	}
 
 	@Override
 	public void vibrate(long[] pattern, int repeat) {
-		input.vibrate(pattern, repeat);
+		if (input != null) {
+			input.vibrate(pattern, repeat);
+		}
 	}
 
 	@Override
 	public void cancelVibrate() {
-		input.cancelVibrate();
+		if (input != null) {
+			input.cancelVibrate();
+		}
 	}
 
 	@Override
 	public float getAzimuth() {
-		return input.getAzimuth();
+		if (input != null) {
+			return input.getAzimuth();
+		} else {
+			return 0;
+		}
 	}
 
 	@Override
 	public float getPitch() {
-		return input.getPitch();
+		if (input != null) {
+			return input.getPitch();
+		} else {
+			return 0;
+		}
 	}
 
 	@Override
@@ -169,67 +250,105 @@ abstract class InputProxy implements Input {
 
 	@Override
 	public void getRotationMatrix(float[] matrix) {
-		input.getRotationMatrix(matrix);
+		if (input != null) {
+			input.getRotationMatrix(matrix);
+		}
 	}
 
 	@Override
 	public long getCurrentEventTime() {
-		return input.getCurrentEventTime();
+		if (input != null) {
+			return input.getCurrentEventTime();
+		} else {
+			return System.currentTimeMillis() * 1000;
+		}
 	}
 
 	@Override
 	public void setCatchBackKey(boolean catchBack) {
-		input.setCatchBackKey(catchBack);
+		if (input != null) {
+			input.setCatchBackKey(catchBack);
+		}
 	}
 
 	@Override
 	public void setCatchMenuKey(boolean catchMenu) {
-		input.setCatchMenuKey(catchMenu);
+		if (input != null) {
+			input.setCatchMenuKey(catchMenu);
+		}
 	}
 
 	@Override
 	public void setInputProcessor(InputProcessor processor) {
-		input.setInputProcessor(processor);
+		if (input != null) {
+			input.setInputProcessor(processor);
+		}
 	}
 
 	@Override
 	public InputProcessor getInputProcessor() {
-		return input.getInputProcessor();
+		if (input != null) {
+			return input.getInputProcessor();
+		} else {
+			return null;
+		}
 	}
 
 	@Override
 	public boolean isPeripheralAvailable(Peripheral peripheral) {
-		return input.isPeripheralAvailable(peripheral);
+		if (input != null) {
+			return input.isPeripheralAvailable(peripheral);
+		} else {
+			return false;
+		}
 	}
 
 	@Override
 	public int getRotation() {
-		return input.getRotation();
+		if (input != null) {
+			return input.getRotation();
+		} else {
+			return 0;
+		}
 	}
 
 	@Override
 	public Orientation getNativeOrientation() {
-		return input.getNativeOrientation();
+		if (input != null) {
+			return input.getNativeOrientation();
+		} else {
+			return Orientation.Landscape;
+		}
 	}
 
 	@Override
 	public void setCursorCatched(boolean catched) {
-		input.setCursorCatched(catched);
+		if (input != null) {
+			input.setCursorCatched(catched);
+		}
 	}
 
 	@Override
 	public boolean isCursorCatched() {
-		return input.isCursorCatched();
+		if (input != null) {
+			return input.isCursorCatched();
+		} else {
+			return false;
+		}
 	}
 
 	@Override
 	public void setCursorPosition(int x, int y) {
-		input.setCursorPosition(x, y);
+		if (input != null) {
+			input.setCursorPosition(x, y);
+		}
 	}
 
 	@Override
 	public void setCursorImage(Pixmap pixmap, int xHotspot, int yHotspot) {
-		input.setCursorImage(pixmap, xHotspot, yHotspot);
+		if (input != null) {
+			input.setCursorImage(pixmap, xHotspot, yHotspot);
+		}
 	}
 
 	/**

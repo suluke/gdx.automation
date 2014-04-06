@@ -2,7 +2,6 @@ package com.badlogic.gdx.automation.recorder;
 
 import java.util.Iterator;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.automation.recorder.EventBufferAccessHelper.KeyEvent;
@@ -27,21 +26,10 @@ class PlaybackInput extends InputProxy {
 	private InputState state;
 	private long currentEventTimeStamp;
 
-	private boolean paused = false;
-	private final ProcessEventsCaller processEventsCaller;
-
 	public PlaybackInput(Iterator<Text> textIterator,
 			Iterator<PlaceholderText> placeholderTextIterator) {
 		this.textIterator = textIterator;
 		this.placeholderTextIterator = placeholderTextIterator;
-		processEventsCaller = new ProcessEventsCaller();
-	}
-
-	public void setPaused(boolean paused) {
-		if (this.paused && !paused) {
-			Gdx.app.postRunnable(processEventsCaller);
-		}
-		this.paused = paused;
 	}
 
 	@Override
@@ -257,20 +245,14 @@ class PlaybackInput extends InputProxy {
 	@Override
 	public void getTextInput(TextInputListener listener, String title,
 			String text) {
-		if (!paused) {
-			if (textIterator.hasNext()) {
-				String answer = textIterator.next().input;
-				if (answer == null) {
-					listener.canceled();
-				} else {
-					listener.input(answer);
-				}
-			} else {
+		if (textIterator.hasNext()) {
+			String answer = textIterator.next().input;
+			if (answer == null) {
 				listener.canceled();
+			} else {
+				listener.input(answer);
 			}
 		} else {
-			// TODO pause with delaying request answers or delegate to proxied
-			// input or just cancel?
 			listener.canceled();
 		}
 	}
@@ -278,37 +260,15 @@ class PlaybackInput extends InputProxy {
 	@Override
 	public void getPlaceholderTextInput(TextInputListener listener,
 			String title, String placeholder) {
-		if (!paused) {
-			if (placeholderTextIterator.hasNext()) {
-				String answer = placeholderTextIterator.next().input;
-				if (answer == null) {
-					listener.canceled();
-				} else {
-					listener.input(answer);
-				}
-			} else {
+		if (placeholderTextIterator.hasNext()) {
+			String answer = placeholderTextIterator.next().input;
+			if (answer == null) {
 				listener.canceled();
+			} else {
+				listener.input(answer);
 			}
 		} else {
-			// TODO pause with delaying request answers or delegate to proxied
-			// input or just cancel?
 			listener.canceled();
-		}
-	}
-
-	/**
-	 * Hooks into the application's main thread/loop to notify the current
-	 * {@link InputProcessor} about key and touch events as any other backend
-	 * would do.
-	 * 
-	 */
-	private class ProcessEventsCaller implements Runnable {
-		@Override
-		public void run() {
-			PlaybackInput.this.processEvents();
-			if (!paused) {
-				Gdx.app.postRunnable(this);
-			}
 		}
 	}
 
@@ -316,7 +276,7 @@ class PlaybackInput extends InputProxy {
 	 * Code mainly stolen from AndroidInput and LwjglInput, adapted to work with
 	 * the remaining recorder code.
 	 */
-	private void processEvents() {
+	void processEvents() {
 		synchronized (state) {
 			state.justTouched = false;
 

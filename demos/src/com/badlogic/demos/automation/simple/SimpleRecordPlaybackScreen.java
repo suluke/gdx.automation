@@ -6,7 +6,7 @@ import com.badlogic.demos.automation.AbstractScreen;
 import com.badlogic.demos.automation.Game;
 import com.badlogic.demos.automation.InputVisualizer;
 import com.badlogic.demos.automation.StyleHelper;
-import com.badlogic.gdx.automation.recorder.InputRecordPlayer;
+import com.badlogic.gdx.automation.recorder.InputPlayer;
 import com.badlogic.gdx.automation.recorder.InputRecorder;
 import com.badlogic.gdx.automation.recorder.InputRecorderConfiguration;
 import com.badlogic.gdx.automation.recorder.PlaybackAdapter;
@@ -157,7 +157,7 @@ public class SimpleRecordPlaybackScreen extends AbstractScreen {
 		public boolean handle(Event event) {
 			if (event instanceof ChangeEvent) {
 				currentState = State.PLAYBACK;
-				InputRecordPlayer player = new InputRecordPlayer(
+				InputPlayer player = new InputPlayer(
 						writer.getReader());
 				player.addPlaybackListener(new PlaybackAdapter() {
 					@Override
