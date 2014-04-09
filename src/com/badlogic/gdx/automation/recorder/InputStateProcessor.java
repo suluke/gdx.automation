@@ -2,8 +2,10 @@ package com.badlogic.gdx.automation.recorder;
 
 import java.io.IOException;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.automation.recorder.EventBufferAccessHelper.KeyEvent;
 import com.badlogic.gdx.automation.recorder.EventBufferAccessHelper.PointerEvent;
+import com.badlogic.gdx.automation.recorder.InputValue.SyncValue;
 import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Accelerometer;
 import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Button;
 import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.KeyPressed;
@@ -156,30 +158,64 @@ class InputStateProcessor {
 	private void processPointers(InputState state) throws IOException {
 		int maxPtrs = recorder.getConfiguration().recordedPointerCount;
 		InputRecordWriter writer = recorder.getRecordWriter();
-		// TODO are the deltas really dependent on the coordinates?
-		for (int i = 0; i < maxPtrs; i++) {
-			if (lastState == null || state.justTouched != lastState.justTouched
-					|| state.x[i] != lastState.x[i]
-					|| state.y[i] != lastState.y[i]) {
-				Pointer ptrChange = new Pointer();
-				ptrChange.x = state.x[i];
-				ptrChange.y = state.y[i];
-				ptrChange.deltaX = state.deltaX[i];
-				ptrChange.deltaY = state.deltaY[i];
-				ptrChange.pointer = i;
-				ptrChange.timeDelta = getTimeDelta();
-				writer.writeSyncValues(ptrChange);
+		if (recorder.getConfiguration().absoluteCoords) {
+			for (int i = 0; i < maxPtrs; i++) {
+				// TODO are the deltas really dependent on the coordinates?
+				if (lastState == null
+						|| state.justTouched != lastState.justTouched
+						|| state.x[i] != lastState.x[i]
+						|| state.y[i] != lastState.y[i]) {
+					Pointer ptrChange = new Pointer();
+					ptrChange.x = state.x[i];
+					ptrChange.y = state.y[i];
+					ptrChange.deltaX = state.deltaX[i];
+					ptrChange.deltaY = state.deltaY[i];
+					ptrChange.pointer = i;
+					ptrChange.timeDelta = getTimeDelta();
+					writer.writeSyncValues(ptrChange);
+				}
+			}
+		} else {
+			int w = Gdx.graphics.getWidth();
+			int h = Gdx.graphics.getHeight();
+			for (int i = 0; i < maxPtrs; i++) {
+				if (lastState == null
+						|| state.justTouched != lastState.justTouched
+						|| state.x[i] != lastState.x[i]
+						|| state.y[i] != lastState.y[i]) {
+					Pointer ptrChange = new Pointer();
+					ptrChange.x = state.x[i] / w;
+					ptrChange.y = state.y[i] / h;
+					ptrChange.deltaX = state.deltaX[i] / w;
+					ptrChange.deltaY = state.deltaY[i] / h;
+					ptrChange.pointer = i;
+					ptrChange.timeDelta = getTimeDelta();
+					writer.writeSyncValues(ptrChange);
+				}
 			}
 		}
 	}
 
 	private void processPointerEvents(InputState state) throws IOException {
 		InputRecordWriter writer = recorder.getRecordWriter();
-		for (PointerEvent event : state.pointerEvents) {
-			com.badlogic.gdx.automation.recorder.InputValue.SyncValue.PointerEvent ptrEvent = new com.badlogic.gdx.automation.recorder.InputValue.SyncValue.PointerEvent(
-					event);
-			ptrEvent.timeDelta = getTimeDelta();
-			writer.writeSyncValues(ptrEvent);
+		if (recorder.getConfiguration().absoluteCoords) {
+			for (PointerEvent event : state.pointerEvents) {
+				SyncValue.PointerEvent ptrEvent = new SyncValue.PointerEvent(
+						event);
+				ptrEvent.timeDelta = getTimeDelta();
+				writer.writeSyncValues(ptrEvent);
+			}
+		} else {
+			int w = Gdx.graphics.getWidth();
+			int h = Gdx.graphics.getHeight();
+			for (PointerEvent event : state.pointerEvents) {
+				SyncValue.PointerEvent ptrEvent = new SyncValue.PointerEvent(
+						event);
+				ptrEvent.x /= w;
+				ptrEvent.y /= h;
+				ptrEvent.timeDelta = getTimeDelta();
+				writer.writeSyncValues(ptrEvent);
+			}
 		}
 	}
 
