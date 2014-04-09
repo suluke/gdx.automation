@@ -10,7 +10,7 @@ import com.badlogic.gdx.automation.recorder.InputPlayer;
 import com.badlogic.gdx.automation.recorder.InputRecorder;
 import com.badlogic.gdx.automation.recorder.InputRecorderConfiguration;
 import com.badlogic.gdx.automation.recorder.PlaybackAdapter;
-import com.badlogic.gdx.automation.recorder.formats.MemoryInputRecordWriter;
+import com.badlogic.gdx.automation.recorder.io.MemoryInputRecordWriter;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;

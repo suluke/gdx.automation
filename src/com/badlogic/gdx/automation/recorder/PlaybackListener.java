@@ -1,6 +1,6 @@
 package com.badlogic.gdx.automation.recorder;
 
-import com.badlogic.gdx.automation.recorder.formats.InputRecordReader;
+import com.badlogic.gdx.automation.recorder.io.InputRecordReader;
 
 /**
  * Listener interface for providing callbacks to an {@link InputPlayer} for

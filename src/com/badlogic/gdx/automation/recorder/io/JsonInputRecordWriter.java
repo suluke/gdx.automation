@@ -1,4 +1,4 @@
-package com.badlogic.gdx.automation.recorder.formats;
+package com.badlogic.gdx.automation.recorder.io;
 
 import java.io.IOException;
 import java.io.Writer;

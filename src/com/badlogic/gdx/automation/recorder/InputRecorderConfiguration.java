@@ -1,7 +1,7 @@
 package com.badlogic.gdx.automation.recorder;
 
-import com.badlogic.gdx.automation.recorder.formats.InputRecordWriter;
-import com.badlogic.gdx.automation.recorder.formats.JsonInputRecordWriter;
+import com.badlogic.gdx.automation.recorder.io.InputRecordWriter;
+import com.badlogic.gdx.automation.recorder.io.JsonInputRecordWriter;
 import com.badlogic.gdx.files.FileHandle;
 
 /**

@@ -1,21 +1,21 @@
-package com.badlogic.gdx.automation.recorder.formats;
+package com.badlogic.gdx.automation.recorder.io;
 
 import java.util.Iterator;
 
-import com.badlogic.gdx.automation.recorder.InputValue;
-import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue;
-import com.badlogic.gdx.automation.recorder.InputValue.StaticValues;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue;
 import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.PlaceholderText;
 import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.Text;
+import com.badlogic.gdx.automation.recorder.InputValue.StaticValues;
+import com.badlogic.gdx.automation.recorder.InputValue.SyncValue;
 
 /**
- * Simple implementation of a {@link InputRecordReader} reading input data from
- * a json formatted file, most likely generated using
- * {@link JsonInputRecordWriter}.
+ * Reader to generate random input to be fed to the application. Replaces
+ * android's monkey tool.
  * 
+ * This is still WIP TODO, so not public api
+ * 
+ * @author Lukas Böhm
  */
-public class JsonInputRecordReader implements InputRecordReader {
+class RandomInputRecordReader implements InputRecordReader {
 
 	@Override
 	public Iterator<Text> getTextIterator() {

@@ -60,28 +60,17 @@ See the demos folder and the eclipse project within for code in action:
 
 ## Future development
 * ~~get recording to work with simple writer/ output format~~ CHECK!
-* implement player
+* implement `InputPlayer`
 * use less reflection. Use real backends with real access to platform specific code.
+* comply with libGdx' style guidelines
 * implement possibility to respond to certain inputs while recording
   * enables writing a gui or something with hotkeys to start/pause/resume/stop recording
-* implement a player supporting to mix the recorded input with the actual input
+* `InputCombinator`: implement a player supporting to mix the recorded input with the actual input
   * e.g. specify regions that still listen to current device events, so an onscreen button can stop a playback.
     This would be great for tutorials.
-* implement callbacks 
+* implement callbacks during playback
   * ~~on replay finished, so e.g. a tutorial will automatically be replayed~~ CHECK!
-  * on certain input events, so they can be visualized
-* Implement an android style monkey tool
-
-## Not supported
-* Recording of software triggered input capabilities like 
-  * catching `back key` on android
-  * catch `menu key` on android
-  * catching cursor on desktop and saving the success of `getCursorCatched`
-  * setting the cursor 
-  * making the software keyboard visible
-  
-  This simply should not be necessary to be recorded, as recordings are supposed to record what input influences the program flow, not how the program flow influences the input.
-  Although, I guess, it wouldn't be too hard to record them.
+* `RandomInputRecordReader`: implement an android-style monkey tool
 
 ## Contributing
 I would be happy to receive any pull requests with improvements.

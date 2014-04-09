@@ -10,7 +10,7 @@ import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.KeyPressed;
 import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Orientation;
 import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Pointer;
 import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Type;
-import com.badlogic.gdx.automation.recorder.formats.InputRecordWriter;
+import com.badlogic.gdx.automation.recorder.io.InputRecordWriter;
 
 /**
  * A class to be fed InputStates via {@link #process(InputState)} so it can

@@ -5,8 +5,8 @@ import java.lang.reflect.UndeclaredThrowableException;
 
 import com.badlogic.gdx.Files.FileType;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.automation.recorder.formats.InputRecordWriter;
-import com.badlogic.gdx.automation.recorder.formats.JsonInputRecordWriter;
+import com.badlogic.gdx.automation.recorder.io.InputRecordWriter;
+import com.badlogic.gdx.automation.recorder.io.JsonInputRecordWriter;
 
 /**
  * The main class for input recording in a libGDX application.

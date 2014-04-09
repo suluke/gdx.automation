@@ -1,4 +1,4 @@
-package com.badlogic.gdx.automation.recorder.formats;
+package com.badlogic.gdx.automation.recorder.io;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -8,7 +8,7 @@ import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.PlaceholderTex
 import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.Text;
 import com.badlogic.gdx.automation.recorder.InputValue.StaticValues;
 import com.badlogic.gdx.automation.recorder.InputValue.SyncValue;
-import com.badlogic.gdx.automation.recorder.formats.MemoryInputRecordWriter.AsyncValueQueues;
+import com.badlogic.gdx.automation.recorder.io.MemoryInputRecordWriter.AsyncValueQueues;
 
 public class MemoryInputRecordReader implements InputRecordReader {
 

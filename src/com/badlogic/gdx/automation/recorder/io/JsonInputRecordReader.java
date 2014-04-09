@@ -1,4 +1,4 @@
-package com.badlogic.gdx.automation.recorder.formats;
+package com.badlogic.gdx.automation.recorder.io;
 
 import java.util.Iterator;
 
@@ -10,11 +10,12 @@ import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.PlaceholderTex
 import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.Text;
 
 /**
- * Reader to generate random input to be fed to the application. Replaces
- * android's monkey tool.
+ * Simple implementation of a {@link InputRecordReader} reading input data from
+ * a json formatted file, most likely generated using
+ * {@link JsonInputRecordWriter}.
  * 
  */
-public class RandomInputRecordReader implements InputRecordReader {
+public class JsonInputRecordReader implements InputRecordReader {
 
 	@Override
 	public Iterator<Text> getTextIterator() {

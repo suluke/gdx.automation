@@ -8,7 +8,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.automation.recorder.InputValue.SyncValue;
-import com.badlogic.gdx.automation.recorder.formats.InputRecordReader;
+import com.badlogic.gdx.automation.recorder.io.InputRecordReader;
 
 /**
  * Standard implementation of a player playing back recorded or generated input.
