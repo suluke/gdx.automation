@@ -495,10 +495,10 @@ public class InputState {
 
 		@Override
 		public void visitPointer(Pointer pointer) {
-			x[pointer.pointer] = pointer.x;
-			y[pointer.pointer] = pointer.y;
-			deltaX[pointer.pointer] = pointer.deltaX;
-			deltaY[pointer.pointer] = pointer.deltaY;
+			x[pointer.pointer] = (int) pointer.x;
+			y[pointer.pointer] = (int) pointer.y;
+			deltaX[pointer.pointer] = (int) pointer.deltaX;
+			deltaY[pointer.pointer] = (int) pointer.deltaY;
 		}
 
 		@Override

@@ -58,8 +58,8 @@ public abstract class InputProperty {
 
 		/**
 		 * Method to accept {@link SyncPropertyVisitor}s, so that concrete child
-		 * classes of {@link SyncProperty} can execute child-specific code of the
-		 * concrete visitor implementation. This is great to omit
+		 * classes of {@link SyncProperty} can execute child-specific code of
+		 * the concrete visitor implementation. This is great to omit
 		 * <code>instancof</code> or <code>getClass()</code> by having the jvm
 		 * doing the dispatching
 		 * 
@@ -218,8 +218,8 @@ public abstract class InputProperty {
 			}
 
 			public Type type;
-			public int x;
-			public int y;
+			public float x;
+			public float y;
 			public int scrollAmount;
 			public int button;
 			public int pointer;
@@ -251,10 +251,10 @@ public abstract class InputProperty {
 		 */
 		public static class Pointer extends SyncProperty {
 			public int pointer;
-			public int x;
-			public int y;
-			public int deltaX;
-			public int deltaY;
+			public float x;
+			public float y;
+			public float deltaX;
+			public float deltaY;
 
 			@Override
 			public void accept(SyncPropertyVisitor visitor) {
@@ -312,9 +312,9 @@ public abstract class InputProperty {
 	 */
 	public static abstract class AsyncProperty {
 		/**
-		 * Method to accept {@link AsyncPropertyVisitor}s, so that concrete child
-		 * classes of {@link AsyncProperty} can execute child-specific code of the
-		 * concrete visitor implementation. This is great to omit
+		 * Method to accept {@link AsyncPropertyVisitor}s, so that concrete
+		 * child classes of {@link AsyncProperty} can execute child-specific
+		 * code of the concrete visitor implementation. This is great to omit
 		 * <code>instancof</code> or <code>getClass()</code> by having the jvm
 		 * doing the dispatching
 		 * 
@@ -358,12 +358,12 @@ public abstract class InputProperty {
 	}
 
 	/**
-	 * An interface to enable the visitor pattern on {@link AsyncProperty}s. This
-	 * means, it helps to have the JVM do the dispatching of the concrete
-	 * underlying {@link AsyncProperty} type of an instance. Using this interface
-	 * also adds compiler support for adding new types, since extending the
-	 * interface automatically breaks concrete implementations that are not
-	 * adapted for the newly added types.
+	 * An interface to enable the visitor pattern on {@link AsyncProperty}s.
+	 * This means, it helps to have the JVM do the dispatching of the concrete
+	 * underlying {@link AsyncProperty} type of an instance. Using this
+	 * interface also adds compiler support for adding new types, since
+	 * extending the interface automatically breaks concrete implementations
+	 * that are not adapted for the newly added types.
 	 * 
 	 */
 	public static interface AsyncPropertyVisitor {

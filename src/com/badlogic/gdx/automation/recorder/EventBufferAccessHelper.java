@@ -60,8 +60,8 @@ class EventBufferAccessHelper {
 			pointer = event.pointer;
 			scrollAmount = event.scrollAmount;
 			type = event.type;
-			x = event.x;
-			y = event.y;
+			x = (int) event.x;
+			y = (int) event.y;
 		}
 
 		long timeStamp;

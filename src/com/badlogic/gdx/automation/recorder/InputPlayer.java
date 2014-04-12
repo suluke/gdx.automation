@@ -8,6 +8,14 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.Accelerometer;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.Button;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.KeyEvent;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.KeyPressed;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.Orientation;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.Pointer;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.PointerEvent;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncPropertyVisitor;
 import com.badlogic.gdx.automation.recorder.io.InputRecordReader;
 
 /**
@@ -20,6 +28,7 @@ public class InputPlayer {
 	private final List<PlaybackListener> listeners;
 	private final MainThreadRunnable mainThread;
 	private final ReaderThreadRunnable readerThread;
+	private final RecordProperties properties;
 	/**
 	 * the original input provided by the libGdx back end in use
 	 */
@@ -28,6 +37,7 @@ public class InputPlayer {
 	public static final String LOG_TAG = "InputPlayer";
 
 	public InputPlayer(InputRecordReader reader) {
+		properties = reader.getRecordProperties();
 		playback = new PlaybackInput(reader.getTextIterator(),
 				reader.getPlaceholderTextIterator(), reader.getStaticValues());
 		listeners = new ArrayList<PlaybackListener>();
@@ -193,6 +203,14 @@ public class InputPlayer {
 
 		@Override
 		public void run() {
+			if (properties.absouluteCoords) {
+				denormalizedProcessing();
+			} else {
+				normalizedProcessing();
+			}
+		}
+
+		private void denormalizedProcessing() {
 			int sleep;
 			SyncProperty currentVal;
 			InputState state = playback.getState();
@@ -229,5 +247,106 @@ public class InputPlayer {
 				}
 			}
 		}
+
+		private void normalizedProcessing() {
+			int sleep;
+			SyncProperty currentVal;
+			InputState state = playback.getState();
+			while (!Thread.currentThread().isInterrupted()) {
+				sleep = 0;
+				do {
+					if (delayMs != 0) {
+						break;
+					}
+					if (!syncIterator.hasNext()) {
+						notifyFinished();
+						return;
+					}
+					currentVal = syncIterator.next();
+					PropertyDenormalizer.denormalize(currentVal);
+					sleep += currentVal.timeDelta;
+
+					synchronized (state) {
+						state.apply(currentVal);
+					}
+				} while (sleep <= MIN_SLEEP);
+
+				if (delayMs != 0) {
+					synchronized (thread) {
+						sleep += delayMs;
+						delayMs = 0;
+					}
+				}
+
+				try {
+					Thread.sleep(sleep);
+				} catch (InterruptedException ex) {
+					Thread.currentThread().interrupt();
+					break;
+				}
+			}
+		}
+	}
+
+	/**
+	 * A class providing static functionality to denormalize screen coordinates
+	 * and deltas that are part of {@link SyncProperty SyncProperties}. This
+	 * mainly affects {@link Pointer} and {@link PointerEvent};
+	 * 
+	 * @author Lukas Böhm
+	 * 
+	 */
+	public static class PropertyDenormalizer implements SyncPropertyVisitor {
+
+		private static PropertyDenormalizer denormalizer;;
+
+		private PropertyDenormalizer() {
+		}
+
+		public static void denormalize(SyncProperty property) {
+			if (denormalizer == null) {
+				denormalizer = new PropertyDenormalizer();
+			}
+			property.accept(denormalizer);
+		}
+
+		@Override
+		public void visitAccelerometer(Accelerometer accelerometer) {
+		}
+
+		@Override
+		public void visitKeyPressed(KeyPressed keyPressed) {
+		}
+
+		@Override
+		public void visitPointerEvent(PointerEvent pointerEvent) {
+			int width = Gdx.graphics.getWidth();
+			int height = Gdx.graphics.getHeight();
+			pointerEvent.x *= width;
+			pointerEvent.y *= height;
+		}
+
+		@Override
+		public void visitKeyEvent(KeyEvent keyEvent) {
+		}
+
+		@Override
+		public void visitOrientation(Orientation orientation) {
+		}
+
+		@Override
+		public void visitPointer(Pointer pointer) {
+			int width = Gdx.graphics.getWidth();
+			int height = Gdx.graphics.getHeight();
+			pointer.x *= width;
+			pointer.deltaX *= width;
+			pointer.y *= height;
+			pointer.deltaY *= height;
+		}
+
+		@Override
+		public void visitButton(Button button) {
+		}
+
 	}
 }

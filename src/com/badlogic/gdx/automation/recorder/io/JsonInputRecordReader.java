@@ -246,8 +246,8 @@ public class JsonInputRecordReader extends JsonInputRecord implements
 				pointerEvent.scrollAmount = json.getInt("scrollAmount");
 				pointerEvent.type = PointerEvent.Type.valueOf(json
 						.getString("type"));
-				pointerEvent.x = json.getInt("x");
-				pointerEvent.y = json.getInt("y");
+				pointerEvent.x = json.getFloat("x");
+				pointerEvent.y = json.getFloat("y");
 			}
 
 			@Override
@@ -275,11 +275,11 @@ public class JsonInputRecordReader extends JsonInputRecord implements
 
 			@Override
 			public void visitPointer(Pointer pointer) {
-				pointer.deltaX = json.getInt("deltaX");
-				pointer.deltaY = json.getInt("deltaY");
+				pointer.deltaX = json.getFloat("deltaX");
+				pointer.deltaY = json.getFloat("deltaY");
 				pointer.pointer = json.getInt("pointer");
-				pointer.x = json.getInt("x");
-				pointer.y = json.getInt("y");
+				pointer.x = json.getFloat("x");
+				pointer.y = json.getFloat("y");
 			}
 
 			@Override
