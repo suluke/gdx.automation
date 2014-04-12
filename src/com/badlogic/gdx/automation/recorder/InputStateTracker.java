@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
@@ -23,8 +24,12 @@ class InputStateTracker {
 	private final InputRecorder recorder;
 	private final Processor processor;
 
-	private List<InputState> bufferStates;
-	private List<InputState> processStates;
+	/**
+	 * Two arraylists: One to be filled by the grabber and one to be emptied by
+	 * the processor. Then a rapid switch between both can be performed.
+	 */
+	private List<InputState> storedStates;
+	private List<InputState> processedStates;
 	private final Pool<InputState> statePool;
 
 	private final Tracker tracker;
@@ -32,8 +37,19 @@ class InputStateTracker {
 	private final InputEventGrabber grabber;
 	private final GrabberArmer grabberArmer;
 	private final GrabberKeeper grabberKeeper;
-	private final int valuesTrackFlags;
-	private final int buffersTrackFlag;
+	/**
+	 * the flags indicating all values to be tracked on the
+	 * {@link Application#postRunnable(Runnable) main thread}, right before most
+	 * concrete back end {@link Input} implementations call processEvents()
+	 */
+	private final int beforePrcessEventsTrackFlags;
+	/**
+	 * the flags indicating all values to be tracked right at the moment when
+	 * most concrete back end {@link Input} implementations call
+	 * processEvents(), thus being tracked at the perfect moment when the event
+	 * buffers are filled the best
+	 */
+	private final int onProcessEventsTrackFlags;
 
 	private static final int STATES_UNTIL_PROCESS = 20;
 
@@ -56,7 +72,7 @@ class InputStateTracker {
 		if (recorder.getConfiguration().recordPointers) {
 			toSet |= InputValue.SyncValue.Type.POINTERS.key;
 		}
-		valuesTrackFlags = toSet;
+		beforePrcessEventsTrackFlags = toSet;
 
 		toSet = 0;
 		if (recorder.getConfiguration().recordKeyEvents) {
@@ -65,10 +81,10 @@ class InputStateTracker {
 		if (recorder.getConfiguration().recordPointerEvents) {
 			toSet |= InputValue.SyncValue.Type.POINTER_EVENTS.key;
 		}
-		buffersTrackFlag = toSet;
+		onProcessEventsTrackFlags = toSet;
 
-		bufferStates = new ArrayList<InputState>();
-		processStates = new ArrayList<InputState>();
+		storedStates = new ArrayList<InputState>();
+		processedStates = new ArrayList<InputState>();
 
 		statePool = new ReflectionPool<InputState>(InputState.class, 50);
 		processor = new Processor();
@@ -116,14 +132,15 @@ class InputStateTracker {
 
 	private void track() {
 		synchronized (processor) {
-			synchronized (bufferStates) {
+			synchronized (storedStates) {
 				currentState = statePool.obtain();
 				currentState
 						.initialize(recorder.getConfiguration().recordedPointerCount);
 
-				currentState.set(Gdx.input, valuesTrackFlags, false);
-				bufferStates.add(currentState);
-				if (bufferStates.size() >= STATES_UNTIL_PROCESS) {
+				currentState
+						.set(Gdx.input, beforePrcessEventsTrackFlags, false);
+				storedStates.add(currentState);
+				if (storedStates.size() >= STATES_UNTIL_PROCESS) {
 					processor.notify();
 				}
 			}
@@ -134,6 +151,7 @@ class InputStateTracker {
 	 * An input that will not allow the InputEventGrabber {@link InputProcessor}
 	 * to be overwritten via setInputProcessor
 	 * 
+	 * @author Lukas Böhm
 	 */
 	private class GrabberKeeper extends InputProxy {
 		@Override
@@ -156,6 +174,7 @@ class InputStateTracker {
 	 * processEvents, the place right after the input event buffers are filled
 	 * and right before they are cleared.
 	 * 
+	 * @author Lukas Böhm
 	 */
 	private class InputEventGrabber extends InputProcessorProxy {
 		private boolean armed = false;
@@ -168,7 +187,7 @@ class InputStateTracker {
 		protected synchronized void onEvent() {
 			if (armed) {
 				armed = false;
-				currentState.set(Gdx.input, buffersTrackFlag, false);
+				currentState.set(Gdx.input, onProcessEventsTrackFlags, false);
 			}
 		}
 	}
@@ -178,6 +197,7 @@ class InputStateTracker {
 	 * events (arm it) just before the first event of the current main loop
 	 * cycle is being processed
 	 * 
+	 * @author Lukas Böhm
 	 */
 	private class GrabberArmer implements Runnable {
 		private boolean running;
@@ -204,6 +224,7 @@ class InputStateTracker {
 	 * A worker thread to process and write input state changes back without
 	 * blocking the main loop
 	 * 
+	 * @author Lukas Böhm
 	 */
 	private class Processor implements Runnable {
 		private Thread processorThread;
@@ -249,12 +270,12 @@ class InputStateTracker {
 		 * {@link InputRecorder}'s {@link InputRecordWriter}
 		 */
 		private void process() {
-			List<InputState> swap = bufferStates;
-			synchronized (bufferStates) {
-				bufferStates = processStates;
+			List<InputState> swap = storedStates;
+			synchronized (storedStates) {
+				storedStates = processedStates;
 			}
-			processStates = swap;
-			for (InputState state : processStates) {
+			processedStates = swap;
+			for (InputState state : processedStates) {
 				try {
 					processor.process(state);
 				} catch (IOException e) {
@@ -262,7 +283,7 @@ class InputStateTracker {
 				}
 				statePool.free(state);
 			}
-			processStates.clear();
+			processedStates.clear();
 		}
 
 		@Override
@@ -285,6 +306,7 @@ class InputStateTracker {
 	 * Runnable to be posted on the main loop's thread to repeatedly call
 	 * {@link InputStateTracker#track() track()}
 	 * 
+	 * @author Lukas Böhm
 	 */
 	private class Tracker implements Runnable {
 		private boolean running = false;

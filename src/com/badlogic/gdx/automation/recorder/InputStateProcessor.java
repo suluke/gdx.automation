@@ -41,6 +41,9 @@ class InputStateProcessor {
 		if (config.recordPointers) {
 			flags |= Type.POINTERS.key;
 		}
+		if (config.recordPointerEvents) {
+			flags |= Type.POINTER_EVENTS.key;
+		}
 		copiedValuesFlag = flags;
 
 		if (config.recordKeyEvents) {
@@ -48,9 +51,6 @@ class InputStateProcessor {
 		}
 		if (config.recordKeysPressed) {
 			flags |= Type.KEYS_PRESSED.key;
-		}
-		if (config.recordPointerEvents) {
-			flags |= Type.POINTER_EVENTS.key;
 		}
 		trackedValuesFlag = flags;
 	}
@@ -121,11 +121,26 @@ class InputStateProcessor {
 
 	private void processKeysPressed(InputState state) throws IOException {
 		InputRecordWriter writer = recorder.getRecordWriter();
+		// look for newly pressed keys
 		for (int key : state.pressedKeys.keySet()) {
-			KeyPressed pressed = new KeyPressed();
-			pressed.keyCode = key;
-			pressed.timeDelta = getTimeDelta();
-			writer.writeSyncValues(pressed);
+			if (state.pressedKeys.get(key) && !lastState.pressedKeys.get(key)) {
+				KeyPressed pressed = new KeyPressed();
+				pressed.keyCode = key;
+				pressed.type = KeyPressed.Type.PRESS;
+				pressed.timeDelta = getTimeDelta();
+				writer.writeSyncValues(pressed);
+			}
+		}
+
+		// look for released keys
+		for (int key : lastState.pressedKeys.keySet()) {
+			if (lastState.pressedKeys.get(key) && !state.pressedKeys.get(key)) {
+				KeyPressed pressed = new KeyPressed();
+				pressed.keyCode = key;
+				pressed.type = KeyPressed.Type.RELEASE;
+				pressed.timeDelta = getTimeDelta();
+				writer.writeSyncValues(pressed);
+			}
 		}
 	}
 

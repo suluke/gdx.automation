@@ -42,12 +42,6 @@ class RandomInputRecordReader implements InputRecordReader {
 	}
 
 	@Override
-	public void reset() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public void close() {
 		// TODO Auto-generated method stub
 

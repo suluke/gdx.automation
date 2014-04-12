@@ -3,8 +3,6 @@ package com.badlogic.gdx.automation.recorder;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Orientation;
 import com.badlogic.gdx.Input.Peripheral;
-import com.badlogic.gdx.automation.recorder.EventBufferAccessHelper.KeyState;
-import com.badlogic.gdx.automation.recorder.EventBufferAccessHelper.PointerState;
 import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.PlaceholderText;
 import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.Text;
 import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Accelerometer;
@@ -115,7 +113,11 @@ public abstract class InputValue {
 		 * 
 		 */
 		public static class KeyPressed extends SyncValue {
+			public enum Type {
+				PRESS, RELEASE
+			}
 
+			public Type type;
 			public int keyCode;
 
 			@Override
@@ -131,9 +133,35 @@ public abstract class InputValue {
 		 * 
 		 */
 		public static class KeyEvent extends SyncValue {
-			public KeyState type;
+			public enum Type {
+				KEY_DOWN, KEY_UP, KEY_TYPED;
+				static Type mapAndroid(int i) {
+					switch (i) {
+					case 0:
+						return KEY_DOWN;
+					case 1:
+						return KEY_UP;
+					case 2:
+						return KEY_TYPED;
+					default:
+						throw new IllegalArgumentException(i
+								+ " out of sensible KeyState range");
+					}
+				}
+
+				static Type mapDesktop(int i) {
+					// luckily they have the same implementation
+					return mapAndroid(i);
+				}
+			}
+
+			public Type type;
 			public int keyCode;
 			public char keyChar;
+
+			public KeyEvent() {
+
+			}
 
 			KeyEvent(
 					com.badlogic.gdx.automation.recorder.EventBufferAccessHelper.KeyEvent event) {
@@ -154,12 +182,51 @@ public abstract class InputValue {
 		 * 
 		 */
 		public static class PointerEvent extends SyncValue {
-			public PointerState type;
+			public enum Type {
+				TOUCH_DOWN, TOUCH_UP, TOUCH_DRAGGED, TOUCH_SCROLLED, TOUCH_MOVED;
+				static Type mapAndroid(int i) {
+					switch (i) {
+					case 0:
+						return TOUCH_DOWN;
+					case 1:
+						return TOUCH_UP;
+					case 2:
+						return TOUCH_DRAGGED;
+					default:
+						throw new IllegalArgumentException(i
+								+ " out of Android's sensible TouchState range");
+					}
+				}
+
+				static Type mapDesktop(int i) {
+					switch (i) {
+					case 0:
+						return TOUCH_DOWN;
+					case 1:
+						return TOUCH_UP;
+					case 2:
+						return TOUCH_DRAGGED;
+					case 3:
+						return TOUCH_SCROLLED;
+					case 4:
+						return TOUCH_MOVED;
+					default:
+						throw new IllegalArgumentException(i
+								+ " out of Desktop's sensible TouchState range");
+					}
+				}
+			}
+
+			public Type type;
 			public int x;
 			public int y;
 			public int scrollAmount;
 			public int button;
 			public int pointer;
+
+			public PointerEvent() {
+
+			}
 
 			PointerEvent(
 					com.badlogic.gdx.automation.recorder.EventBufferAccessHelper.PointerEvent event) {

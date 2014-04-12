@@ -45,7 +45,6 @@ public class MemoryInputRecordReader implements InputRecordReader {
 		return staticValues;
 	}
 
-	@Override
 	public void reset() {
 		syncValues.clear();
 		syncValues.addAll(writer.getSyncValues());

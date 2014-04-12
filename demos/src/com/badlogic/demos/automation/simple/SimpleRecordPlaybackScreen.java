@@ -157,8 +157,7 @@ public class SimpleRecordPlaybackScreen extends AbstractScreen {
 		public boolean handle(Event event) {
 			if (event instanceof ChangeEvent) {
 				currentState = State.PLAYBACK;
-				InputPlayer player = new InputPlayer(
-						writer.getReader());
+				InputPlayer player = new InputPlayer(writer.getReader());
 				player.addPlaybackListener(new PlaybackAdapter() {
 					@Override
 					public void onSynchronousFinish() {
@@ -167,6 +166,7 @@ public class SimpleRecordPlaybackScreen extends AbstractScreen {
 					}
 				});
 				layout();
+				player.startPlayback();
 			}
 			return true;
 		}

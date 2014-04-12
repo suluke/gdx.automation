@@ -6,10 +6,10 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.automation.recorder.EventBufferAccessHelper.KeyEvent;
 import com.badlogic.gdx.automation.recorder.EventBufferAccessHelper.PointerEvent;
-import com.badlogic.gdx.automation.recorder.EventBufferAccessHelper.PointerState;
 import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.PlaceholderText;
 import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.Text;
-import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.automation.recorder.InputValue.StaticValues;
+import com.badlogic.gdx.automation.recorder.InputValue.SyncValue;
 
 /**
  * A simple implementation of the {@link Input} interface, designed to simply
@@ -21,57 +21,23 @@ class PlaybackInput extends InputProxy {
 
 	private final Iterator<Text> textIterator;
 	private final Iterator<PlaceholderText> placeholderTextIterator;
+	private final StaticValues features;
 
 	private InputProcessor processor = null;
-	private InputState state;
+	private final InputState state;
 	private long currentEventTimeStamp;
 
 	public PlaybackInput(Iterator<Text> textIterator,
-			Iterator<PlaceholderText> placeholderTextIterator) {
+			Iterator<PlaceholderText> placeholderTextIterator,
+			StaticValues features) {
+		state = new InputState(20);
 		this.textIterator = textIterator;
 		this.placeholderTextIterator = placeholderTextIterator;
+		this.features = features;
 	}
 
-	@Override
-	public void setOnscreenKeyboardVisible(boolean visible) {
-		if (input != null) {
-			input.setOnscreenKeyboardVisible(visible);
-		}
-	}
-
-	@Override
-	public void vibrate(int milliseconds) {
-		if (input != null) {
-			input.vibrate(milliseconds);
-		}
-	}
-
-	@Override
-	public void vibrate(long[] pattern, int repeat) {
-		if (input != null) {
-			input.vibrate(pattern, repeat);
-		}
-	}
-
-	@Override
-	public void cancelVibrate() {
-		if (input != null) {
-			input.cancelVibrate();
-		}
-	}
-
-	@Override
-	public void setCatchBackKey(boolean catchBack) {
-		if (input != null) {
-			input.setCatchBackKey(catchBack);
-		}
-	}
-
-	@Override
-	public void setCatchMenuKey(boolean catchMenu) {
-		if (input != null) {
-			input.setCatchMenuKey(catchMenu);
-		}
+	InputState getState() {
+		return state;
 	}
 
 	@Override
@@ -86,44 +52,27 @@ class PlaybackInput extends InputProxy {
 
 	@Override
 	public boolean isPeripheralAvailable(Peripheral peripheral) {
-		if (input != null) {
-			return input.isPeripheralAvailable(peripheral);
+		switch (peripheral) {
+		case Accelerometer:
+			return features.accelerometerAvailable;
+		case Compass:
+			return features.compassAvailable;
+		case HardwareKeyboard:
+			return features.keyboardAvailable;
+		case MultitouchScreen:
+			return features.hasMultitouch;
+		case OnscreenKeyboard:
+			return features.onscreenKeyboard;
+		case Vibrator:
+			return features.vibrator;
+		default:
+			return false;
 		}
-		return false;
 	}
 
 	@Override
 	public Orientation getNativeOrientation() {
-		if (input != null) {
-			return input.getNativeOrientation();
-		}
-		return Orientation.Landscape;
-	}
-
-	@Override
-	public void setCursorCatched(boolean catched) {
-		if (input != null) {
-			input.setCursorCatched(catched);
-		}
-	}
-
-	@Override
-	public void setCursorPosition(int x, int y) {
-		if (input != null) {
-			input.setCursorPosition(x, y);
-		}
-	}
-
-	@Override
-	public void setCursorImage(Pixmap pixmap, int xHotspot, int yHotspot) {
-		if (input != null) {
-			input.setCursorImage(pixmap, xHotspot, yHotspot);
-		}
-	}
-
-	@Override
-	public boolean isCursorCatched() {
-		return input.isCursorCatched();
+		return features.nativeOrientation;
 	}
 
 	@Override
@@ -334,7 +283,7 @@ class PlaybackInput extends InputProxy {
 				int len = state.pointerEvents.size();
 				for (int i = 0; i < len; i++) {
 					PointerEvent e = state.pointerEvents.get(i);
-					if (e.type == PointerState.TOUCH_DOWN) {
+					if (e.type == SyncValue.PointerEvent.Type.TOUCH_DOWN) {
 						state.justTouched = true;
 					}
 				}

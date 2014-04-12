@@ -4,11 +4,21 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
 
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.automation.recorder.InputValue.SyncValue;
+import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Accelerometer;
+import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Button;
+import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.KeyEvent;
+import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.KeyPressed;
+import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Orientation;
+import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Pointer;
+import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.PointerEvent;
 import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Type;
+import com.badlogic.gdx.automation.recorder.InputValue.SyncValueVisitor;
 import com.badlogic.gdx.utils.TimeUtils;
 
 /**
@@ -21,6 +31,8 @@ import com.badlogic.gdx.utils.TimeUtils;
 public class InputState {
 
 	private int MAX_POINTERS;
+
+	private final SyncValueApplier applier;
 
 	public float accelerometerX;
 	public float accelerometerY;
@@ -51,9 +63,10 @@ public class InputState {
 
 	public int orientation;
 
-	public long timeStamp;
+	public long timeStamp = TimeUtils.millis();
 
 	public InputState() {
+		applier = new SyncValueApplier();
 		pressedKeys = new SparseArray<Boolean>();
 		keyEvents = new ArrayList<EventBufferAccessHelper.KeyEvent>();
 		pointerEvents = new ArrayList<EventBufferAccessHelper.PointerEvent>();
@@ -110,10 +123,11 @@ public class InputState {
 			button2 = state.button2;
 		}
 		if ((copyFlags & Type.KEY_EVENTS.key) != 0) {
-
+			keyEvents.clear();
+			keyEvents.addAll(state.keyEvents);
 		}
 		if ((copyFlags & Type.KEYS_PRESSED.key) != 0) {
-
+			setPressedKeys(state.pressedKeys);
 		}
 		if ((copyFlags & Type.ORIENTATION.key) != 0) {
 			accelerometerX = state.accelerometerX;
@@ -134,7 +148,17 @@ public class InputState {
 			justTouched = state.justTouched;
 		}
 		if ((copyFlags & Type.POINTER_EVENTS.key) != 0) {
+			pointerEvents.clear();
+			pointerEvents.addAll(state.pointerEvents);
+		}
+	}
 
+	public void setPressedKeys(SparseArray<Boolean> pressed) {
+		for (Map.Entry<Integer, Boolean> entry : pressedKeys.entrySet()) {
+			entry.setValue(false);
+		}
+		for (Map.Entry<Integer, Boolean> entry : pressed.entrySet()) {
+			pressedKeys.put(entry.getKey(), Boolean.TRUE);
 		}
 	}
 
@@ -423,5 +447,66 @@ public class InputState {
 	 */
 	public int getPointerCount() {
 		return MAX_POINTERS;
+	}
+
+	public void apply(SyncValue syncValue) {
+		syncValue.accept(applier);
+	}
+
+	private class SyncValueApplier implements SyncValueVisitor {
+		@Override
+		public void visitAccelerometer(Accelerometer accelerometer) {
+			accelerometerX = accelerometer.accelerometerX;
+			accelerometerY = accelerometer.accelerometerY;
+			accelerometerZ = accelerometer.accelerometerZ;
+		}
+
+		@Override
+		public void visitKeyPressed(KeyPressed keyPressed) {
+			pressedKeys.put(keyPressed.keyCode, Boolean.TRUE);
+			// TODO where are the keys cleared?
+		}
+
+		@Override
+		public void visitPointerEvent(PointerEvent pointerEvent) {
+			EventBufferAccessHelper.PointerEvent addedEvent = new EventBufferAccessHelper.PointerEvent(
+					pointerEvent);
+			addedEvent.timeStamp = timeStamp;
+			pointerEvents.add(addedEvent);
+		}
+
+		@Override
+		public void visitKeyEvent(KeyEvent keyEvent) {
+			EventBufferAccessHelper.KeyEvent addedEvent = new EventBufferAccessHelper.KeyEvent(
+					keyEvent);
+			addedEvent.timeStamp = timeStamp;
+			keyEvents.add(addedEvent);
+		}
+
+		@Override
+		public void visitOrientation(Orientation orientation) {
+			InputState.this.orientation = orientation.orientation;
+			roll = orientation.roll;
+			pitch = orientation.pitch;
+			azimuth = orientation.azimuth;
+			System.arraycopy(orientation.rotationMatrix, 0,
+					InputState.this.rotationMatrix, 0, 16);
+		}
+
+		@Override
+		public void visitPointer(Pointer pointer) {
+			x[pointer.pointer] = pointer.x;
+			y[pointer.pointer] = pointer.y;
+			deltaX[pointer.pointer] = pointer.deltaX;
+			deltaY[pointer.pointer] = pointer.deltaY;
+		}
+
+		@Override
+		public void visitButton(Button button) {
+			button0 = button.button0;
+			button1 = button.button1;
+			button2 = button.button2;
+		}
+
 	}
 }

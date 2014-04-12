@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.automation.recorder.InputValue.SyncValue;
 import com.badlogic.gdx.automation.recorder.io.InputRecordReader;
@@ -23,14 +22,14 @@ public class InputPlayer {
 	/**
 	 * the original input provided by the libGdx back end in use
 	 */
-	private final Input gdxInput;
 	private final Iterator<SyncValue> syncIterator;
+
+	public static final String LOG_TAG = "InputPlayer";
 
 	public InputPlayer(InputRecordReader reader) {
 		playback = new PlaybackInput(reader.getTextIterator(),
-				reader.getPlaceholderTextIterator());
+				reader.getPlaceholderTextIterator(), reader.getStaticValues());
 		listeners = new ArrayList<PlaybackListener>();
-		gdxInput = Gdx.input;
 		syncIterator = reader.getSyncValueIterator();
 
 		mainThread = new MainThreadRunnable();
@@ -38,8 +37,10 @@ public class InputPlayer {
 	}
 
 	public void startPlayback() {
-		playback.setProxiedInput(gdxInput);
-		Gdx.input = playback;
+		synchronized (Gdx.input) {
+			playback.setProxiedInput(Gdx.input);
+			Gdx.input = playback;
+		}
 		readerThread.start();
 		mainThread.start();
 		notifyStart();
@@ -52,11 +53,15 @@ public class InputPlayer {
 	 * @param seconds
 	 */
 	public void playbackTimeout(float seconds) {
+		readerThread.delay((int) (seconds * 1000));
 	}
 
 	public void stopPlayback() {
 		mainThread.stop();
-		InputProxy.removeProxyFromGdx(playback);
+		readerThread.stop();
+		if (!InputProxy.removeProxyFromGdx(playback)) {
+			Gdx.app.log(LOG_TAG, "Could not remove player from Gdx.input");
+		}
 		notifyStopped();
 	}
 
@@ -97,24 +102,31 @@ public class InputPlayer {
 	 * 
 	 */
 	private class MainThreadRunnable implements Runnable {
-		private boolean paused = true;
+		private boolean interrupted = true;
+		private boolean stopped = true;
 
 		public synchronized void start() {
-			if (paused) {
-				paused = false;
+			if (interrupted) {
+				// busy waiting
+				while (!stopped)
+					continue;
+				interrupted = false;
 				Gdx.app.postRunnable(this);
+				stopped = false;
 			}
 		}
 
 		public synchronized void stop() {
-			paused = true;
+			interrupted = true;
 		}
 
 		@Override
 		public void run() {
-			if (!paused) {
+			if (!interrupted) {
 				playback.processEvents();
 				Gdx.app.postRunnable(this);
+			} else {
+				stopped = true;
 			}
 		}
 	}
@@ -137,18 +149,40 @@ public class InputPlayer {
 		private static final int MIN_SLEEP = 10;
 
 		private Thread thread = null;
+		private int delayMs = 0;
 
 		public synchronized void start() {
-			if (thread == null || !thread.isAlive()) {
-				thread = new Thread(this);
-				thread.setDaemon(true);
-				thread.start();
+			if (thread != null && thread.isAlive()) {
+				if (thread.isInterrupted()) {
+					try {
+						thread.join();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				} else {
+					return;
+				}
+			}
+			thread = new Thread(this);
+			thread.setDaemon(true);
+			thread.start();
+		}
+
+		public void delay(int ms) {
+			// TODO care about ms < 0?
+			synchronized (thread) {
+				delayMs += ms;
 			}
 		}
 
 		public synchronized void stop() {
 			if (thread != null) {
 				thread.interrupt();
+				try {
+					thread.join();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 
@@ -156,9 +190,13 @@ public class InputPlayer {
 		public void run() {
 			int sleep;
 			SyncValue currentVal;
+			InputState state = playback.getState();
 			while (!Thread.currentThread().isInterrupted()) {
 				sleep = 0;
 				do {
+					if (delayMs != 0) {
+						break;
+					}
 					if (!syncIterator.hasNext()) {
 						notifyFinished();
 						return;
@@ -166,8 +204,18 @@ public class InputPlayer {
 					currentVal = syncIterator.next();
 					sleep += currentVal.timeDelta;
 
-					// TODO apply currentVal
+					synchronized (state) {
+						state.apply(currentVal);
+					}
 				} while (sleep <= MIN_SLEEP);
+
+				if (delayMs != 0) {
+					synchronized (thread) {
+						sleep += delayMs;
+						delayMs = 0;
+					}
+				}
+
 				try {
 					Thread.sleep(sleep);
 				} catch (InterruptedException ex) {

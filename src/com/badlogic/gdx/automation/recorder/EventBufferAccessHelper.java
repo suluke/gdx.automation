@@ -10,6 +10,7 @@ import java.util.List;
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.automation.recorder.InputValue.SyncValue;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.IntMap.Keys;
 
@@ -24,6 +25,7 @@ import com.badlogic.gdx.utils.IntMap.Keys;
 class EventBufferAccessHelper {
 	static final ArrayList<KeyEvent> keyEvents = new ArrayList<KeyEvent>();
 	static final ArrayList<PointerEvent> pointerEvents = new ArrayList<PointerEvent>();
+	// TODO SparseArray is shit. Replace with 256 byte ByteBuffer like in lwjgl
 	private static final SparseArray<Boolean> pressedKeys = new SparseArray<Boolean>();
 	private static List<Object> inputKeyEvents = null;
 	private static List<Object> inputPointerEvents = null;
@@ -33,73 +35,37 @@ class EventBufferAccessHelper {
 	private static Input pointerEventsFrom = null;
 	private static Input keyEventsFrom = null;
 
-	static enum KeyState {
-		KEY_DOWN, KEY_UP, KEY_TYPED;
-		public static KeyState mapAndroid(int i) {
-			switch (i) {
-			case 0:
-				return KEY_DOWN;
-			case 1:
-				return KEY_UP;
-			case 2:
-				return KEY_TYPED;
-			default:
-				throw new IllegalArgumentException(i
-						+ " out of sensible KeyState range");
-			}
-		}
-
-		public static KeyState mapDesktop(int i) {
-			// luckily they have the same implementation
-			return mapAndroid(i);
-		}
-	}
-
 	static class KeyEvent {
+		public KeyEvent() {
+		}
+
+		public KeyEvent(SyncValue.KeyEvent event) {
+			keyChar = event.keyChar;
+			keyCode = event.keyCode;
+			type = event.type;
+		}
+
 		long timeStamp;
-		KeyState type;
+		SyncValue.KeyEvent.Type type;
 		int keyCode;
 		char keyChar;
 	}
 
-	static enum PointerState {
-		TOUCH_DOWN, TOUCH_UP, TOUCH_DRAGGED, TOUCH_SCROLLED, TOUCH_MOVED;
-		public static PointerState mapAndroid(int i) {
-			switch (i) {
-			case 0:
-				return TOUCH_DOWN;
-			case 1:
-				return TOUCH_UP;
-			case 2:
-				return TOUCH_DRAGGED;
-			default:
-				throw new IllegalArgumentException(i
-						+ " out of Android's sensible TouchState range");
-			}
-		}
-
-		public static PointerState mapDesktop(int i) {
-			switch (i) {
-			case 0:
-				return TOUCH_DOWN;
-			case 1:
-				return TOUCH_UP;
-			case 2:
-				return TOUCH_DRAGGED;
-			case 3:
-				return TOUCH_SCROLLED;
-			case 4:
-				return TOUCH_MOVED;
-			default:
-				throw new IllegalArgumentException(i
-						+ " out of Desktop's sensible TouchState range");
-			}
-		}
-	}
-
 	static class PointerEvent {
+		public PointerEvent() {
+		}
+
+		public PointerEvent(SyncValue.PointerEvent event) {
+			button = event.button;
+			pointer = event.pointer;
+			scrollAmount = event.scrollAmount;
+			type = event.type;
+			x = event.x;
+			y = event.y;
+		}
+
 		long timeStamp;
-		PointerState type;
+		SyncValue.PointerEvent.Type type;
 		int x;
 		int y;
 		int scrollAmount;
@@ -148,11 +114,13 @@ class EventBufferAccessHelper {
 				e.timeStamp = (Long) accessField(
 						getField(event.getClass(), "timeStamp"), event);
 				if (Gdx.app.getType() == ApplicationType.Android) {
-					e.type = KeyState.mapAndroid((Integer) accessField(
-							getField(event.getClass(), "type"), event));
+					e.type = SyncValue.KeyEvent.Type
+							.mapAndroid((Integer) accessField(
+									getField(event.getClass(), "type"), event));
 				} else if (Gdx.app.getType() == ApplicationType.Desktop) {
-					e.type = KeyState.mapDesktop((Integer) accessField(
-							getField(event.getClass(), "type"), event));
+					e.type = SyncValue.KeyEvent.Type
+							.mapDesktop((Integer) accessField(
+									getField(event.getClass(), "type"), event));
 				} else {
 					throw new IllegalStateException(
 							"Recorder is not supporting backend "
@@ -208,11 +176,13 @@ class EventBufferAccessHelper {
 							getField(event.getClass(), "scrollAmount"), event);
 					e.button = (Integer) accessField(
 							getField(event.getClass(), "button"), event);
-					e.type = PointerState.mapDesktop((Integer) accessField(
-							getField(event.getClass(), "type"), event));
+					e.type = SyncValue.PointerEvent.Type
+							.mapDesktop((Integer) accessField(
+									getField(event.getClass(), "type"), event));
 				} else {
-					e.type = PointerState.mapAndroid((Integer) accessField(
-							getField(event.getClass(), "type"), event));
+					e.type = SyncValue.PointerEvent.Type
+							.mapAndroid((Integer) accessField(
+									getField(event.getClass(), "type"), event));
 				}
 				pointerEvents.add(e);
 			}

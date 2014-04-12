@@ -3,15 +3,12 @@ package com.badlogic.gdx.automation.recorder.io;
 import java.io.IOException;
 import java.io.Writer;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.automation.recorder.InputValue;
 import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue;
+import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.PlaceholderText;
+import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.Text;
 import com.badlogic.gdx.automation.recorder.InputValue.AsyncValueVisitor;
 import com.badlogic.gdx.automation.recorder.InputValue.StaticValues;
 import com.badlogic.gdx.automation.recorder.InputValue.SyncValue;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValueVisitor;
-import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.PlaceholderText;
-import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.Text;
 import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Accelerometer;
 import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Button;
 import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.KeyEvent;
@@ -19,6 +16,7 @@ import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.KeyPressed;
 import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Orientation;
 import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Pointer;
 import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.PointerEvent;
+import com.badlogic.gdx.automation.recorder.InputValue.SyncValueVisitor;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.JsonWriter;
 import com.badlogic.gdx.utils.JsonWriter.OutputType;
@@ -29,31 +27,17 @@ import com.badlogic.gdx.utils.JsonWriter.OutputType;
  * values) using the {@link JsonWriter json} format.
  * 
  */
-public class JsonInputRecordWriter implements InputRecordWriter {
+public class JsonInputRecordWriter extends JsonInputRecord implements
+		InputRecordWriter {
 	private final SyncValuesHandler syncHandler = new SyncValuesHandler();
 	private final AsyncValuesHandler asyncHandler = new AsyncValuesHandler();
-	private final FileHandle outputFile;
-	private final FileHandle syncOutputFile;
-	private final FileHandle asyncOutputFile;
-	private final FileHandle staticOutputFile;
 	private Writer syncFileWriter;
 	private JsonWriter syncJsonWriter;
 	private Writer asyncFileWriter;
 	private JsonWriter asyncJsonWriter;
 
 	public JsonInputRecordWriter(FileHandle output) throws IOException {
-		this.outputFile = output;
-		// TODO be more graceful with existing files, care ore about the actual
-		// FileHandle given (maybe merge on close) etc.
-		syncOutputFile = Gdx.files.getFileHandle(
-				outputFile.pathWithoutExtension() + "-sync.json",
-				outputFile.type());
-		asyncOutputFile = Gdx.files.getFileHandle(
-				outputFile.pathWithoutExtension() + "-async.json",
-				outputFile.type());
-		staticOutputFile = Gdx.files.getFileHandle(
-				outputFile.pathWithoutExtension() + "-static.json",
-				outputFile.type());
+		super(output);
 	}
 
 	@Override
@@ -68,7 +52,7 @@ public class JsonInputRecordWriter implements InputRecordWriter {
 
 	@Override
 	public void writeStaticValues(StaticValues values) throws IOException {
-		Writer staticFileWriter = staticOutputFile.writer(false);
+		Writer staticFileWriter = staticValuesFile.writer(false);
 		JsonWriter writer = new JsonWriter(staticFileWriter);
 		writer.setOutputType(OutputType.minimal);
 
@@ -114,6 +98,7 @@ public class JsonInputRecordWriter implements InputRecordWriter {
 			try {
 				syncJsonWriter.object();
 				syncJsonWriter.set("class", "KeyPressed");
+				syncJsonWriter.set("type", keyPressed.type);
 				syncJsonWriter.set("keyCode", keyPressed.keyCode);
 				syncJsonWriter.set("timeDelta", keyPressed.timeDelta);
 				syncJsonWriter.pop();
@@ -257,8 +242,8 @@ public class JsonInputRecordWriter implements InputRecordWriter {
 	@Override
 	public void open() throws IOException {
 		close();
-		syncFileWriter = syncOutputFile.writer(false);
-		asyncFileWriter = asyncOutputFile.writer(false);
+		syncFileWriter = syncValuesFile.writer(false);
+		asyncFileWriter = asyncValuesFile.writer(false);
 
 		syncJsonWriter = new JsonWriter(syncFileWriter);
 		asyncJsonWriter = new JsonWriter(asyncFileWriter);
