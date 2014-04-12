@@ -4,19 +4,20 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import com.badlogic.gdx.Input.Orientation;
-import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue;
-import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.PlaceholderText;
-import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.Text;
-import com.badlogic.gdx.automation.recorder.InputValue.AsyncValueVisitor;
-import com.badlogic.gdx.automation.recorder.InputValue.StaticValues;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Accelerometer;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Button;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.KeyEvent;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.KeyPressed;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Pointer;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.PointerEvent;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValueVisitor;
+import com.badlogic.gdx.automation.recorder.InputProperty.AsyncProperty;
+import com.badlogic.gdx.automation.recorder.InputProperty.AsyncProperty.PlaceholderText;
+import com.badlogic.gdx.automation.recorder.InputProperty.AsyncProperty.Text;
+import com.badlogic.gdx.automation.recorder.InputProperty.AsyncPropertyVisitor;
+import com.badlogic.gdx.automation.recorder.InputProperty.StaticProperties;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.Accelerometer;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.Button;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.KeyEvent;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.KeyPressed;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.Pointer;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.PointerEvent;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncPropertyVisitor;
+import com.badlogic.gdx.automation.recorder.RecordProperties;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
@@ -31,7 +32,8 @@ import com.badlogic.gdx.utils.JsonValue.JsonIterator;
  */
 public class JsonInputRecordReader extends JsonInputRecord implements
 		InputRecordReader {
-	private final StaticValues staticValues;
+	private final RecordProperties recordProperties;
+	private final StaticProperties staticProperties;
 	private final JsonReader reader;
 
 	private JsonValue syncValues;
@@ -40,13 +42,14 @@ public class JsonInputRecordReader extends JsonInputRecord implements
 	public JsonInputRecordReader(FileHandle input) {
 		super(input);
 		reader = new JsonReader();
-		staticValues = readStaticValues(new StaticValues());
-		readSyncValues();
-		readAsyncValues();
+		recordProperties = readRecordProperties(new RecordProperties());
+		staticProperties = readStaticValues(new StaticProperties());
+		readSyncProperties();
+		readAsyncProperties();
 	}
 
-	private StaticValues readStaticValues(StaticValues values) {
-		JsonValue json = reader.parse(staticValuesFile.reader());
+	private StaticProperties readStaticValues(StaticProperties values) {
+		JsonValue json = reader.parse(staticPropertiesFile.reader());
 		values.accelerometerAvailable = json
 				.getBoolean("accelerometerAvailable");
 		values.compassAvailable = json.getBoolean("compassAvailable");
@@ -59,12 +62,18 @@ public class JsonInputRecordReader extends JsonInputRecord implements
 		return values;
 	}
 
-	private void readSyncValues() {
-		syncValues = reader.parse(syncValuesFile.reader());
+	private RecordProperties readRecordProperties(RecordProperties properties) {
+		JsonValue json = reader.parse(recordPropertiesFile.reader());
+		properties.absouluteCoords = json.getBoolean("absouluteCoords");
+		return recordProperties;
 	}
 
-	private void readAsyncValues() {
-		asyncValues = reader.parse(asyncValuesFile.reader());
+	private void readSyncProperties() {
+		syncValues = reader.parse(syncPropertiesFile.reader());
+	}
+
+	private void readAsyncProperties() {
+		asyncValues = reader.parse(asyncPropertiesFile.reader());
 	}
 
 	@Override
@@ -78,7 +87,7 @@ public class JsonInputRecordReader extends JsonInputRecord implements
 				"PlaceholderText");
 	}
 
-	private class AsyncFilterIterator<T extends AsyncValue> implements
+	private class AsyncFilterIterator<T extends AsyncProperty> implements
 			Iterator<T> {
 		private final Class<?> filter;
 		private final String name;
@@ -140,10 +149,10 @@ public class JsonInputRecordReader extends JsonInputRecord implements
 			throw new UnsupportedOperationException();
 		}
 
-		private class ValueBuilder implements AsyncValueVisitor {
+		private class ValueBuilder implements AsyncPropertyVisitor {
 			private JsonValue json;
 
-			public void build(AsyncValue val, JsonValue json) {
+			public void build(AsyncProperty val, JsonValue json) {
 				this.json = json;
 				val.accept(this);
 			}
@@ -162,11 +171,11 @@ public class JsonInputRecordReader extends JsonInputRecord implements
 	}
 
 	@Override
-	public Iterator<SyncValue> getSyncValueIterator() {
+	public Iterator<SyncProperty> getSyncValueIterator() {
 		return new SyncIterator();
 	}
 
-	private class SyncIterator implements Iterator<SyncValue> {
+	private class SyncIterator implements Iterator<SyncProperty> {
 		private final JsonIterator it = syncValues.iterator();
 		private final ValueBuilder builder = new ValueBuilder();
 
@@ -176,24 +185,24 @@ public class JsonInputRecordReader extends JsonInputRecord implements
 		}
 
 		@Override
-		public SyncValue next() {
+		public SyncProperty next() {
 			JsonValue val = it.next();
 			String clazz = val.getString("class");
-			SyncValue result = null;
+			SyncProperty result = null;
 			if (clazz.equals("Accelerometer")) {
-				result = new SyncValue.Accelerometer();
+				result = new SyncProperty.Accelerometer();
 			} else if (clazz.equals("KeyPressed")) {
-				result = new SyncValue.KeyPressed();
+				result = new SyncProperty.KeyPressed();
 			} else if (clazz.equals("PointerEvent")) {
-				result = new SyncValue.PointerEvent();
+				result = new SyncProperty.PointerEvent();
 			} else if (clazz.equals("KeyEvent")) {
-				result = new SyncValue.KeyEvent();
+				result = new SyncProperty.KeyEvent();
 			} else if (clazz.equals("Orientation")) {
-				result = new SyncValue.Orientation();
+				result = new SyncProperty.Orientation();
 			} else if (clazz.equals("Pointer")) {
-				result = new SyncValue.Pointer();
+				result = new SyncProperty.Pointer();
 			} else if (clazz.equals("Button")) {
-				result = new SyncValue.Button();
+				result = new SyncProperty.Button();
 			}
 			builder.build(result, val);
 			return result;
@@ -204,10 +213,10 @@ public class JsonInputRecordReader extends JsonInputRecord implements
 			throw new UnsupportedOperationException();
 		}
 
-		private class ValueBuilder implements SyncValueVisitor {
+		private class ValueBuilder implements SyncPropertyVisitor {
 			private JsonValue json;
 
-			public void build(SyncValue val, JsonValue json) {
+			public void build(SyncProperty val, JsonValue json) {
 				if (val == null) {
 					return;
 				}
@@ -249,7 +258,7 @@ public class JsonInputRecordReader extends JsonInputRecord implements
 			}
 
 			@Override
-			public void visitOrientation(SyncValue.Orientation orientation) {
+			public void visitOrientation(SyncProperty.Orientation orientation) {
 				orientation.azimuth = json.getFloat("azimuth");
 				orientation.orientation = json.getInt("orientation");
 				orientation.pitch = json.getFloat("pitch");
@@ -283,18 +292,24 @@ public class JsonInputRecordReader extends JsonInputRecord implements
 	}
 
 	@Override
-	public StaticValues getStaticValues() {
-		return staticValues;
+	public StaticProperties getStaticValues() {
+		return staticProperties;
 	}
 
 	public void reset() {
-		readStaticValues(staticValues);
-		readSyncValues();
-		readAsyncValues();
+		readRecordProperties(recordProperties);
+		readStaticValues(staticProperties);
+		readSyncProperties();
+		readAsyncProperties();
 	}
 
 	@Override
 	public void close() {
+	}
+
+	@Override
+	public RecordProperties getRecordProperties() {
+		return recordProperties;
 	}
 
 }

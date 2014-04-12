@@ -2,10 +2,11 @@ package com.badlogic.gdx.automation.recorder.io;
 
 import java.io.IOException;
 
+import com.badlogic.gdx.automation.recorder.InputProperty.AsyncProperty;
+import com.badlogic.gdx.automation.recorder.InputProperty.StaticProperties;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty;
 import com.badlogic.gdx.automation.recorder.InputRecorder;
-import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue;
-import com.badlogic.gdx.automation.recorder.InputValue.StaticValues;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue;
+import com.badlogic.gdx.automation.recorder.RecordProperties;
 
 /**
  * Interface for classes providing means to save or transmit user input recorded
@@ -14,11 +15,13 @@ import com.badlogic.gdx.automation.recorder.InputValue.SyncValue;
  * 
  */
 public interface InputRecordWriter extends java.io.Flushable, java.io.Closeable {
-	void writeStaticValues(StaticValues values) throws IOException;
+	void writeRecordProperties(RecordProperties properties) throws IOException;
 
-	void writeSyncValues(SyncValue values) throws IOException;
+	void writeStaticValues(StaticProperties values) throws IOException;
 
-	void writeAsyncValues(AsyncValue values) throws IOException;
+	void writeSyncValues(SyncProperty values) throws IOException;
+
+	void writeAsyncValues(AsyncProperty values) throws IOException;
 
 	void open() throws IOException;
 }

@@ -3,14 +3,14 @@ package com.badlogic.gdx.automation.recorder;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Orientation;
 import com.badlogic.gdx.Input.Peripheral;
-import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.PlaceholderText;
-import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.Text;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Accelerometer;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Button;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.KeyEvent;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.KeyPressed;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Pointer;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.PointerEvent;
+import com.badlogic.gdx.automation.recorder.InputProperty.AsyncProperty.PlaceholderText;
+import com.badlogic.gdx.automation.recorder.InputProperty.AsyncProperty.Text;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.Accelerometer;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.Button;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.KeyEvent;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.KeyPressed;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.Pointer;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.PointerEvent;
 
 /**
  * Parent class of all (groups of) properties that make up an {@link InputState}
@@ -20,8 +20,8 @@ import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.PointerEvent;
  * 
  * @author Lukas Böhm
  */
-public abstract class InputValue {
-	private InputValue() {
+public abstract class InputProperty {
+	private InputProperty() {
 	}
 
 	/**
@@ -29,12 +29,12 @@ public abstract class InputValue {
 	 * @author Lukas Böhm
 	 * 
 	 */
-	public static abstract class SyncValue {
+	public static abstract class SyncProperty {
 		/**
 		 * Enum helping to create the selection flags used by some methods like
 		 * {@link InputState#set(InputState, int)}. By providing a
 		 * {@link Type#key key} that needs to be OR'ed together only the
-		 * corresponding {@link SyncValue}s will be considered in such a
+		 * corresponding {@link SyncProperty}s will be considered in such a
 		 * process.
 		 * 
 		 * @author Lukas Böhm
@@ -57,18 +57,18 @@ public abstract class InputValue {
 		}
 
 		/**
-		 * Method to accept {@link SyncValueVisitor}s, so that concrete child
-		 * classes of {@link SyncValue} can execute child-specific code of the
+		 * Method to accept {@link SyncPropertyVisitor}s, so that concrete child
+		 * classes of {@link SyncProperty} can execute child-specific code of the
 		 * concrete visitor implementation. This is great to omit
 		 * <code>instancof</code> or <code>getClass()</code> by having the jvm
 		 * doing the dispatching
 		 * 
 		 * @param visitor
 		 */
-		public abstract void accept(SyncValueVisitor visitor);
+		public abstract void accept(SyncPropertyVisitor visitor);
 
 		/**
-		 * Milliseconds passed since the last {@link InputValue} changed
+		 * Milliseconds passed since the last {@link InputProperty} changed
 		 */
 		public long timeDelta;
 
@@ -77,13 +77,13 @@ public abstract class InputValue {
 		 * @author Lukas Böhm
 		 * 
 		 */
-		public static class Accelerometer extends SyncValue {
+		public static class Accelerometer extends SyncProperty {
 			public float accelerometerX;
 			public float accelerometerY;
 			public float accelerometerZ;
 
 			@Override
-			public void accept(SyncValueVisitor visitor) {
+			public void accept(SyncPropertyVisitor visitor) {
 				visitor.visitAccelerometer(this);
 			}
 		}
@@ -93,7 +93,7 @@ public abstract class InputValue {
 		 * @author Lukas Böhm
 		 * 
 		 */
-		public static class Orientation extends SyncValue {
+		public static class Orientation extends SyncProperty {
 			public float roll;
 			public float pitch;
 			public float azimuth;
@@ -101,7 +101,7 @@ public abstract class InputValue {
 			public float[] rotationMatrix = new float[16];
 
 			@Override
-			public void accept(SyncValueVisitor visitor) {
+			public void accept(SyncPropertyVisitor visitor) {
 				visitor.visitOrientation(this);
 			}
 
@@ -112,7 +112,7 @@ public abstract class InputValue {
 		 * @author Lukas Böhm
 		 * 
 		 */
-		public static class KeyPressed extends SyncValue {
+		public static class KeyPressed extends SyncProperty {
 			public enum Type {
 				PRESS, RELEASE
 			}
@@ -121,7 +121,7 @@ public abstract class InputValue {
 			public int keyCode;
 
 			@Override
-			public void accept(SyncValueVisitor visitor) {
+			public void accept(SyncPropertyVisitor visitor) {
 				visitor.visitKeyPressed(this);
 			}
 
@@ -132,7 +132,7 @@ public abstract class InputValue {
 		 * @author Lukas Böhm
 		 * 
 		 */
-		public static class KeyEvent extends SyncValue {
+		public static class KeyEvent extends SyncProperty {
 			public enum Type {
 				KEY_DOWN, KEY_UP, KEY_TYPED;
 				static Type mapAndroid(int i) {
@@ -171,7 +171,7 @@ public abstract class InputValue {
 			}
 
 			@Override
-			public void accept(SyncValueVisitor visitor) {
+			public void accept(SyncPropertyVisitor visitor) {
 				visitor.visitKeyEvent(this);
 			}
 		}
@@ -181,7 +181,7 @@ public abstract class InputValue {
 		 * @author Lukas Böhm
 		 * 
 		 */
-		public static class PointerEvent extends SyncValue {
+		public static class PointerEvent extends SyncProperty {
 			public enum Type {
 				TOUCH_DOWN, TOUCH_UP, TOUCH_DRAGGED, TOUCH_SCROLLED, TOUCH_MOVED;
 				static Type mapAndroid(int i) {
@@ -239,7 +239,7 @@ public abstract class InputValue {
 			}
 
 			@Override
-			public void accept(SyncValueVisitor visitor) {
+			public void accept(SyncPropertyVisitor visitor) {
 				visitor.visitPointerEvent(this);
 			}
 		}
@@ -249,7 +249,7 @@ public abstract class InputValue {
 		 * @author Lukas Böhm
 		 * 
 		 */
-		public static class Pointer extends SyncValue {
+		public static class Pointer extends SyncProperty {
 			public int pointer;
 			public int x;
 			public int y;
@@ -257,7 +257,7 @@ public abstract class InputValue {
 			public int deltaY;
 
 			@Override
-			public void accept(SyncValueVisitor visitor) {
+			public void accept(SyncPropertyVisitor visitor) {
 				visitor.visitPointer(this);
 			}
 		}
@@ -267,28 +267,28 @@ public abstract class InputValue {
 		 * @author Lukas Böhm
 		 * 
 		 */
-		public static class Button extends SyncValue {
+		public static class Button extends SyncProperty {
 			public boolean button0;
 			public boolean button1;
 			public boolean button2;
 
 			@Override
-			public void accept(SyncValueVisitor visitor) {
+			public void accept(SyncPropertyVisitor visitor) {
 				visitor.visitButton(this);
 			}
 		}
 	}
 
 	/**
-	 * An interface to enable the visitor pattern on {@link SyncValue}s. This
+	 * An interface to enable the visitor pattern on {@link SyncProperty}s. This
 	 * means, it helps to have the JVM do the dispatching of the concrete
-	 * underlying {@link SyncValue} type of an instance. Using this interface
+	 * underlying {@link SyncProperty} type of an instance. Using this interface
 	 * also adds compiler support for adding new types, since extending the
 	 * interface automatically breaks concrete implementations that are not
 	 * adapted for the newly added types.
 	 * 
 	 */
-	public static interface SyncValueVisitor {
+	public static interface SyncPropertyVisitor {
 		void visitAccelerometer(Accelerometer accelerometer);
 
 		void visitKeyPressed(KeyPressed keyPressed);
@@ -298,7 +298,7 @@ public abstract class InputValue {
 		void visitKeyEvent(KeyEvent keyEvent);
 
 		void visitOrientation(
-				com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Orientation orientation);
+				com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.Orientation orientation);
 
 		void visitPointer(Pointer pointer);
 
@@ -310,19 +310,19 @@ public abstract class InputValue {
 	 * @author Lukas Böhm
 	 * 
 	 */
-	public static abstract class AsyncValue {
+	public static abstract class AsyncProperty {
 		/**
-		 * Method to accept {@link AsyncValueVisitor}s, so that concrete child
-		 * classes of {@link AsyncValue} can execute child-specific code of the
+		 * Method to accept {@link AsyncPropertyVisitor}s, so that concrete child
+		 * classes of {@link AsyncProperty} can execute child-specific code of the
 		 * concrete visitor implementation. This is great to omit
 		 * <code>instancof</code> or <code>getClass()</code> by having the jvm
 		 * doing the dispatching
 		 * 
 		 * @param visitor
 		 */
-		public abstract void accept(AsyncValueVisitor visitor);
+		public abstract void accept(AsyncPropertyVisitor visitor);
 
-		public static class Text extends AsyncValue {
+		public static class Text extends AsyncProperty {
 			public Text(String text) {
 				input = text;
 			}
@@ -334,12 +334,12 @@ public abstract class InputValue {
 			public String input;
 
 			@Override
-			public void accept(AsyncValueVisitor visitor) {
+			public void accept(AsyncPropertyVisitor visitor) {
 				visitor.visitText(this);
 			}
 		}
 
-		public static class PlaceholderText extends AsyncValue {
+		public static class PlaceholderText extends AsyncProperty {
 			public PlaceholderText(String text) {
 				input = text;
 			}
@@ -351,22 +351,22 @@ public abstract class InputValue {
 			public String input;
 
 			@Override
-			public void accept(AsyncValueVisitor visitor) {
+			public void accept(AsyncPropertyVisitor visitor) {
 				visitor.visitPlaceholderText(this);
 			}
 		}
 	}
 
 	/**
-	 * An interface to enable the visitor pattern on {@link AsyncValue}s. This
+	 * An interface to enable the visitor pattern on {@link AsyncProperty}s. This
 	 * means, it helps to have the JVM do the dispatching of the concrete
-	 * underlying {@link AsyncValue} type of an instance. Using this interface
+	 * underlying {@link AsyncProperty} type of an instance. Using this interface
 	 * also adds compiler support for adding new types, since extending the
 	 * interface automatically breaks concrete implementations that are not
 	 * adapted for the newly added types.
 	 * 
 	 */
-	public static interface AsyncValueVisitor {
+	public static interface AsyncPropertyVisitor {
 		void visitText(Text text);
 
 		void visitPlaceholderText(PlaceholderText text);
@@ -379,7 +379,7 @@ public abstract class InputValue {
 	 * @author Lukas Böhm
 	 * 
 	 */
-	public static class StaticValues extends InputValue {
+	public static class StaticProperties extends InputProperty {
 		public boolean accelerometerAvailable;
 		public boolean compassAvailable;
 		public boolean keyboardAvailable;
@@ -388,7 +388,7 @@ public abstract class InputValue {
 		public boolean hasMultitouch;
 		public Orientation nativeOrientation;
 
-		public void set(StaticValues other) {
+		public void set(StaticProperties other) {
 			accelerometerAvailable = other.accelerometerAvailable;
 			compassAvailable = other.compassAvailable;
 			keyboardAvailable = other.keyboardAvailable;
@@ -400,13 +400,13 @@ public abstract class InputValue {
 	}
 
 	/**
-	 * Copies the {@link StaticValues} from the current {@link Gdx libGdx}
+	 * Copies the {@link StaticProperties} from the current {@link Gdx libGdx}
 	 * environment.
 	 * 
-	 * @return the {@link StaticValues} of the current environment
+	 * @return the {@link StaticProperties} of the current environment
 	 */
-	public static StaticValues getCurrentStaticValues() {
-		StaticValues result = new StaticValues();
+	public static StaticProperties getCurrentStaticValues() {
+		StaticProperties result = new StaticProperties();
 		result.accelerometerAvailable = Gdx.input
 				.isPeripheralAvailable(Peripheral.Accelerometer);
 		result.compassAvailable = Gdx.input

@@ -10,7 +10,7 @@ import java.util.List;
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty;
 import com.badlogic.gdx.utils.IntMap;
 import com.badlogic.gdx.utils.IntMap.Keys;
 
@@ -39,14 +39,14 @@ class EventBufferAccessHelper {
 		public KeyEvent() {
 		}
 
-		public KeyEvent(SyncValue.KeyEvent event) {
+		public KeyEvent(SyncProperty.KeyEvent event) {
 			keyChar = event.keyChar;
 			keyCode = event.keyCode;
 			type = event.type;
 		}
 
 		long timeStamp;
-		SyncValue.KeyEvent.Type type;
+		SyncProperty.KeyEvent.Type type;
 		int keyCode;
 		char keyChar;
 	}
@@ -55,7 +55,7 @@ class EventBufferAccessHelper {
 		public PointerEvent() {
 		}
 
-		public PointerEvent(SyncValue.PointerEvent event) {
+		public PointerEvent(SyncProperty.PointerEvent event) {
 			button = event.button;
 			pointer = event.pointer;
 			scrollAmount = event.scrollAmount;
@@ -65,7 +65,7 @@ class EventBufferAccessHelper {
 		}
 
 		long timeStamp;
-		SyncValue.PointerEvent.Type type;
+		SyncProperty.PointerEvent.Type type;
 		int x;
 		int y;
 		int scrollAmount;
@@ -114,11 +114,11 @@ class EventBufferAccessHelper {
 				e.timeStamp = (Long) accessField(
 						getField(event.getClass(), "timeStamp"), event);
 				if (Gdx.app.getType() == ApplicationType.Android) {
-					e.type = SyncValue.KeyEvent.Type
+					e.type = SyncProperty.KeyEvent.Type
 							.mapAndroid((Integer) accessField(
 									getField(event.getClass(), "type"), event));
 				} else if (Gdx.app.getType() == ApplicationType.Desktop) {
-					e.type = SyncValue.KeyEvent.Type
+					e.type = SyncProperty.KeyEvent.Type
 							.mapDesktop((Integer) accessField(
 									getField(event.getClass(), "type"), event));
 				} else {
@@ -176,11 +176,11 @@ class EventBufferAccessHelper {
 							getField(event.getClass(), "scrollAmount"), event);
 					e.button = (Integer) accessField(
 							getField(event.getClass(), "button"), event);
-					e.type = SyncValue.PointerEvent.Type
+					e.type = SyncProperty.PointerEvent.Type
 							.mapDesktop((Integer) accessField(
 									getField(event.getClass(), "type"), event));
 				} else {
-					e.type = SyncValue.PointerEvent.Type
+					e.type = SyncProperty.PointerEvent.Type
 							.mapAndroid((Integer) accessField(
 									getField(event.getClass(), "type"), event));
 				}

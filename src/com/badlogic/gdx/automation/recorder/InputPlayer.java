@@ -5,8 +5,9 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty;
 import com.badlogic.gdx.automation.recorder.io.InputRecordReader;
 
 /**
@@ -22,7 +23,7 @@ public class InputPlayer {
 	/**
 	 * the original input provided by the libGdx back end in use
 	 */
-	private final Iterator<SyncValue> syncIterator;
+	private final Iterator<SyncProperty> syncIterator;
 
 	public static final String LOG_TAG = "InputPlayer";
 
@@ -38,8 +39,11 @@ public class InputPlayer {
 
 	public void startPlayback() {
 		synchronized (Gdx.input) {
+			Input gdxInput = Gdx.input;
 			playback.setProxiedInput(Gdx.input);
 			Gdx.input = playback;
+			playback.setInputProcessor(gdxInput.getInputProcessor());
+			gdxInput.setInputProcessor(null);
 		}
 		readerThread.start();
 		mainThread.start();
@@ -62,6 +66,7 @@ public class InputPlayer {
 		if (!InputProxy.removeProxyFromGdx(playback)) {
 			Gdx.app.log(LOG_TAG, "Could not remove player from Gdx.input");
 		}
+		Gdx.input.setInputProcessor(playback.getInputProcessor());
 		notifyStopped();
 	}
 
@@ -132,7 +137,7 @@ public class InputPlayer {
 	}
 
 	/**
-	 * A separate thread to apply {@link InputValue} changes read from the
+	 * A separate thread to apply {@link InputProperty} changes read from the
 	 * {@link InputRecordReader} depending on time.
 	 * 
 	 * @author Lukas Böhm
@@ -189,7 +194,7 @@ public class InputPlayer {
 		@Override
 		public void run() {
 			int sleep;
-			SyncValue currentVal;
+			SyncProperty currentVal;
 			InputState state = playback.getState();
 			while (!Thread.currentThread().isInterrupted()) {
 				sleep = 0;

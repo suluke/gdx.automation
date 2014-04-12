@@ -14,7 +14,7 @@ import com.badlogic.gdx.utils.ReflectionPool;
 
 /**
  * Submodule of {@link InputRecorder} responsible for recording
- * {@link InputValue.SyncValue}s
+ * {@link InputProperty.SyncProperty}s
  * 
  * @author Lukas Böhm
  * 
@@ -61,25 +61,25 @@ class InputStateTracker {
 
 		int toSet = 0;
 		if (recorder.getConfiguration().recordButtons) {
-			toSet |= InputValue.SyncValue.Type.BUTTONS.key;
+			toSet |= InputProperty.SyncProperty.Type.BUTTONS.key;
 		}
 		if (recorder.getConfiguration().recordOrientation) {
-			toSet |= InputValue.SyncValue.Type.ORIENTATION.key;
+			toSet |= InputProperty.SyncProperty.Type.ORIENTATION.key;
 		}
 		if (recorder.getConfiguration().recordKeysPressed) {
-			toSet |= InputValue.SyncValue.Type.KEYS_PRESSED.key;
+			toSet |= InputProperty.SyncProperty.Type.KEYS_PRESSED.key;
 		}
 		if (recorder.getConfiguration().recordPointers) {
-			toSet |= InputValue.SyncValue.Type.POINTERS.key;
+			toSet |= InputProperty.SyncProperty.Type.POINTERS.key;
 		}
 		beforePrcessEventsTrackFlags = toSet;
 
 		toSet = 0;
 		if (recorder.getConfiguration().recordKeyEvents) {
-			toSet |= InputValue.SyncValue.Type.KEY_EVENTS.key;
+			toSet |= InputProperty.SyncProperty.Type.KEY_EVENTS.key;
 		}
 		if (recorder.getConfiguration().recordPointerEvents) {
-			toSet |= InputValue.SyncValue.Type.POINTER_EVENTS.key;
+			toSet |= InputProperty.SyncProperty.Type.POINTER_EVENTS.key;
 		}
 		onProcessEventsTrackFlags = toSet;
 

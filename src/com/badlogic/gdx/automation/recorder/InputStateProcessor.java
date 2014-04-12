@@ -5,13 +5,13 @@ import java.io.IOException;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.automation.recorder.EventBufferAccessHelper.KeyEvent;
 import com.badlogic.gdx.automation.recorder.EventBufferAccessHelper.PointerEvent;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Accelerometer;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Button;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.KeyPressed;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Orientation;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Pointer;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Type;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.Accelerometer;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.Button;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.KeyPressed;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.Orientation;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.Pointer;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.Type;
 import com.badlogic.gdx.automation.recorder.io.InputRecordWriter;
 
 /**
@@ -112,7 +112,7 @@ class InputStateProcessor {
 	private void processKeyEvents(InputState state) throws IOException {
 		InputRecordWriter writer = recorder.getRecordWriter();
 		for (KeyEvent event : state.keyEvents) {
-			com.badlogic.gdx.automation.recorder.InputValue.SyncValue.KeyEvent valueEvent = new com.badlogic.gdx.automation.recorder.InputValue.SyncValue.KeyEvent(
+			com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.KeyEvent valueEvent = new com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.KeyEvent(
 					event);
 			valueEvent.timeDelta = getTimeDelta();
 			writer.writeSyncValues(valueEvent);
@@ -215,7 +215,7 @@ class InputStateProcessor {
 		InputRecordWriter writer = recorder.getRecordWriter();
 		if (recorder.getConfiguration().absoluteCoords) {
 			for (PointerEvent event : state.pointerEvents) {
-				SyncValue.PointerEvent ptrEvent = new SyncValue.PointerEvent(
+				SyncProperty.PointerEvent ptrEvent = new SyncProperty.PointerEvent(
 						event);
 				ptrEvent.timeDelta = getTimeDelta();
 				writer.writeSyncValues(ptrEvent);
@@ -224,7 +224,7 @@ class InputStateProcessor {
 			int w = Gdx.graphics.getWidth();
 			int h = Gdx.graphics.getHeight();
 			for (PointerEvent event : state.pointerEvents) {
-				SyncValue.PointerEvent ptrEvent = new SyncValue.PointerEvent(
+				SyncProperty.PointerEvent ptrEvent = new SyncProperty.PointerEvent(
 						event);
 				ptrEvent.x /= w;
 				ptrEvent.y /= h;

@@ -4,24 +4,27 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.PlaceholderText;
-import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.Text;
-import com.badlogic.gdx.automation.recorder.InputValue.StaticValues;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue;
+import com.badlogic.gdx.automation.recorder.InputProperty.AsyncProperty.PlaceholderText;
+import com.badlogic.gdx.automation.recorder.InputProperty.AsyncProperty.Text;
+import com.badlogic.gdx.automation.recorder.InputProperty.StaticProperties;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty;
+import com.badlogic.gdx.automation.recorder.RecordProperties;
 import com.badlogic.gdx.automation.recorder.io.MemoryInputRecordWriter.AsyncValueQueues;
 
 public class MemoryInputRecordReader implements InputRecordReader {
 
 	private final AsyncValueQueues asyncValues;
-	private final List<SyncValue> syncValues;
-	private final StaticValues staticValues;
+	private final List<SyncProperty> syncValues;
+	private final StaticProperties staticValues;
+	private final RecordProperties recordProperties;
 	private final MemoryInputRecordWriter writer;
 
 	public MemoryInputRecordReader(MemoryInputRecordWriter writer) {
 		this.writer = writer;
 		asyncValues = writer.getAsyncValueQueues().copy();
-		syncValues = new LinkedList<SyncValue>();
-		staticValues = new StaticValues();
+		syncValues = new LinkedList<SyncProperty>();
+		staticValues = new StaticProperties();
+		recordProperties = new RecordProperties();
 		reset();
 	}
 
@@ -36,12 +39,12 @@ public class MemoryInputRecordReader implements InputRecordReader {
 	}
 
 	@Override
-	public Iterator<SyncValue> getSyncValueIterator() {
+	public Iterator<SyncProperty> getSyncValueIterator() {
 		return syncValues.iterator();
 	}
 
 	@Override
-	public StaticValues getStaticValues() {
+	public StaticProperties getStaticValues() {
 		return staticValues;
 	}
 
@@ -50,11 +53,17 @@ public class MemoryInputRecordReader implements InputRecordReader {
 		syncValues.addAll(writer.getSyncValues());
 		asyncValues.set(writer.getAsyncValueQueues());
 		staticValues.set(writer.getStaticValues());
+		recordProperties.set(writer.getRecordProperties());
 	}
 
 	@Override
 	public void close() {
 
+	}
+
+	@Override
+	public RecordProperties getRecordProperties() {
+		return recordProperties;
 	}
 
 }

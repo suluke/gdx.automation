@@ -2,10 +2,11 @@ package com.badlogic.gdx.automation.recorder.io;
 
 import java.util.Iterator;
 
-import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.PlaceholderText;
-import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.Text;
-import com.badlogic.gdx.automation.recorder.InputValue.StaticValues;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue;
+import com.badlogic.gdx.automation.recorder.InputProperty.AsyncProperty.PlaceholderText;
+import com.badlogic.gdx.automation.recorder.InputProperty.AsyncProperty.Text;
+import com.badlogic.gdx.automation.recorder.InputProperty.StaticProperties;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty;
+import com.badlogic.gdx.automation.recorder.RecordProperties;
 
 /**
  * Reader to generate random input to be fed to the application. Replaces
@@ -30,13 +31,13 @@ class RandomInputRecordReader implements InputRecordReader {
 	}
 
 	@Override
-	public Iterator<SyncValue> getSyncValueIterator() {
+	public Iterator<SyncProperty> getSyncValueIterator() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public StaticValues getStaticValues() {
+	public StaticProperties getStaticValues() {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -45,6 +46,12 @@ class RandomInputRecordReader implements InputRecordReader {
 	public void close() {
 		// TODO Auto-generated method stub
 
+	}
+
+	@Override
+	public RecordProperties getRecordProperties() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

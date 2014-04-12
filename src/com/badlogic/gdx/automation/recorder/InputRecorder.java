@@ -56,7 +56,10 @@ public class InputRecorder {
 
 	public void startRecording() throws IOException {
 		config.writer.open();
-		config.writer.writeStaticValues(InputValue.getCurrentStaticValues());
+		RecordProperties properties = new RecordProperties();
+		properties.absouluteCoords = config.absoluteCoords;
+		config.writer.writeRecordProperties(properties);
+		config.writer.writeStaticValues(InputProperty.getCurrentStaticValues());
 		textTracker.startTracking();
 		valueTracker.startTracking();
 	}

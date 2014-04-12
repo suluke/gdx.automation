@@ -11,22 +11,26 @@ import com.badlogic.gdx.files.FileHandle;
  */
 class JsonInputRecord {
 	protected final FileHandle outputFile;
-	protected final FileHandle syncValuesFile;
-	protected final FileHandle asyncValuesFile;
-	protected final FileHandle staticValuesFile;
+	protected final FileHandle syncPropertiesFile;
+	protected final FileHandle asyncPropertiesFile;
+	protected final FileHandle staticPropertiesFile;
+	protected final FileHandle recordPropertiesFile;
 
 	public JsonInputRecord(FileHandle jsonBaseFile) {
 		this.outputFile = jsonBaseFile;
 		// TODO be more graceful with existing files, care ore about the actual
 		// FileHandle given (maybe merge on close) etc.
-		syncValuesFile = Gdx.files.getFileHandle(
+		syncPropertiesFile = Gdx.files.getFileHandle(
 				outputFile.pathWithoutExtension() + "-sync.json",
 				outputFile.type());
-		asyncValuesFile = Gdx.files.getFileHandle(
+		asyncPropertiesFile = Gdx.files.getFileHandle(
 				outputFile.pathWithoutExtension() + "-async.json",
 				outputFile.type());
-		staticValuesFile = Gdx.files.getFileHandle(
+		staticPropertiesFile = Gdx.files.getFileHandle(
 				outputFile.pathWithoutExtension() + "-static.json",
+				outputFile.type());
+		recordPropertiesFile = Gdx.files.getFileHandle(
+				outputFile.pathWithoutExtension() + "-properties.json",
 				outputFile.type());
 	}
 }

@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.PlaceholderText;
-import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.Text;
+import com.badlogic.gdx.automation.recorder.InputProperty.AsyncProperty.PlaceholderText;
+import com.badlogic.gdx.automation.recorder.InputProperty.AsyncProperty.Text;
 
 /**
  * Submodule of {@link InputRecorder} responsible for intercepting asynchronous

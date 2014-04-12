@@ -3,9 +3,10 @@ package com.badlogic.gdx.automation.recorder.io;
 import java.util.Iterator;
 
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.automation.recorder.InputValue;
-import com.badlogic.gdx.automation.recorder.InputValue.StaticValues;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue;
+import com.badlogic.gdx.automation.recorder.InputProperty;
+import com.badlogic.gdx.automation.recorder.InputProperty.StaticProperties;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty;
+import com.badlogic.gdx.automation.recorder.RecordProperties;
 
 /**
  * Interface for classes that provide access to a stream of data describing
@@ -14,13 +15,15 @@ import com.badlogic.gdx.automation.recorder.InputValue.SyncValue;
  * {@link RandomInputRecordReader} generates this data on the fly
  */
 public interface InputRecordReader {
-	Iterator<InputValue.AsyncValue.Text> getTextIterator();
+	RecordProperties getRecordProperties();
 
-	Iterator<InputValue.AsyncValue.PlaceholderText> getPlaceholderTextIterator();
+	Iterator<InputProperty.AsyncProperty.Text> getTextIterator();
 
-	Iterator<SyncValue> getSyncValueIterator();
+	Iterator<InputProperty.AsyncProperty.PlaceholderText> getPlaceholderTextIterator();
 
-	StaticValues getStaticValues();
+	Iterator<SyncProperty> getSyncValueIterator();
+
+	StaticProperties getStaticValues();
 
 	void close();
 }

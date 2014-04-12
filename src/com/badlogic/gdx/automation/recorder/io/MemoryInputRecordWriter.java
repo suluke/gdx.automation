@@ -5,13 +5,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.automation.recorder.InputValue;
-import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue;
-import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.PlaceholderText;
-import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.Text;
-import com.badlogic.gdx.automation.recorder.InputValue.AsyncValueVisitor;
-import com.badlogic.gdx.automation.recorder.InputValue.StaticValues;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue;
+import com.badlogic.gdx.automation.recorder.InputProperty;
+import com.badlogic.gdx.automation.recorder.InputProperty.AsyncProperty;
+import com.badlogic.gdx.automation.recorder.InputProperty.AsyncProperty.PlaceholderText;
+import com.badlogic.gdx.automation.recorder.InputProperty.AsyncProperty.Text;
+import com.badlogic.gdx.automation.recorder.InputProperty.AsyncPropertyVisitor;
+import com.badlogic.gdx.automation.recorder.InputProperty.StaticProperties;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty;
+import com.badlogic.gdx.automation.recorder.RecordProperties;
 
 /**
  * Simple writer backend primarily designed for testing
@@ -22,14 +23,16 @@ public class MemoryInputRecordWriter implements InputRecordWriter {
 
 	private boolean open = false;
 
-	private final LinkedList<SyncValue> syncValues;
+	private final LinkedList<SyncProperty> syncValues;
 	private final AsyncValueQueues asyncValueQueues;
-	private final StaticValues staticValues;
+	private final StaticProperties staticValues;
+	private final RecordProperties recordProperties;
 
 	public MemoryInputRecordWriter() {
-		syncValues = new LinkedList<InputValue.SyncValue>();
+		syncValues = new LinkedList<InputProperty.SyncProperty>();
 		asyncValueQueues = new AsyncValueQueues();
-		staticValues = new StaticValues();
+		staticValues = new StaticProperties();
+		recordProperties = new RecordProperties();
 	}
 
 	@Override
@@ -48,7 +51,7 @@ public class MemoryInputRecordWriter implements InputRecordWriter {
 	}
 
 	@Override
-	public void writeStaticValues(StaticValues values) throws IOException {
+	public void writeStaticValues(StaticProperties values) throws IOException {
 		if (!open) {
 			throw new IOException("Cannot write to closed writer");
 		}
@@ -56,7 +59,7 @@ public class MemoryInputRecordWriter implements InputRecordWriter {
 	}
 
 	@Override
-	public void writeSyncValues(SyncValue values) throws IOException {
+	public void writeSyncValues(SyncProperty values) throws IOException {
 		if (!open) {
 			throw new IOException("Cannot write to closed writer");
 		}
@@ -64,7 +67,7 @@ public class MemoryInputRecordWriter implements InputRecordWriter {
 	}
 
 	@Override
-	public void writeAsyncValues(AsyncValue value) throws IOException {
+	public void writeAsyncValues(AsyncProperty value) throws IOException {
 		if (!open) {
 			throw new IOException("Cannot write to closed writer");
 		}
@@ -89,13 +92,13 @@ public class MemoryInputRecordWriter implements InputRecordWriter {
 		return open;
 	}
 
-	static class AsyncValueQueues implements AsyncValueVisitor {
-		final List<AsyncValue.Text> textValues;
-		final List<AsyncValue.PlaceholderText> placeholderTextValues;
+	static class AsyncValueQueues implements AsyncPropertyVisitor {
+		final List<AsyncProperty.Text> textValues;
+		final List<AsyncProperty.PlaceholderText> placeholderTextValues;
 
 		AsyncValueQueues() {
-			textValues = new LinkedList<InputValue.AsyncValue.Text>();
-			placeholderTextValues = new LinkedList<InputValue.AsyncValue.PlaceholderText>();
+			textValues = new LinkedList<InputProperty.AsyncProperty.Text>();
+			placeholderTextValues = new LinkedList<InputProperty.AsyncProperty.PlaceholderText>();
 		}
 
 		public void clear() {
@@ -113,7 +116,7 @@ public class MemoryInputRecordWriter implements InputRecordWriter {
 			placeholderTextValues.add(text);
 		}
 
-		public void storeValue(AsyncValue value) {
+		public void storeValue(AsyncProperty value) {
 			value.accept(this);
 		}
 
@@ -133,7 +136,7 @@ public class MemoryInputRecordWriter implements InputRecordWriter {
 		}
 	}
 
-	List<SyncValue> getSyncValues() {
+	List<SyncProperty> getSyncValues() {
 		return syncValues;
 	}
 
@@ -141,7 +144,16 @@ public class MemoryInputRecordWriter implements InputRecordWriter {
 		return asyncValueQueues;
 	}
 
-	StaticValues getStaticValues() {
+	StaticProperties getStaticValues() {
 		return staticValues;
+	}
+
+	RecordProperties getRecordProperties() {
+		return recordProperties;
+	}
+
+	@Override
+	public void writeRecordProperties(RecordProperties properties) {
+		recordProperties.set(properties);
 	}
 }

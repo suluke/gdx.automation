@@ -3,20 +3,21 @@ package com.badlogic.gdx.automation.recorder.io;
 import java.io.IOException;
 import java.io.Writer;
 
-import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue;
-import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.PlaceholderText;
-import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.Text;
-import com.badlogic.gdx.automation.recorder.InputValue.AsyncValueVisitor;
-import com.badlogic.gdx.automation.recorder.InputValue.StaticValues;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Accelerometer;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Button;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.KeyEvent;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.KeyPressed;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Orientation;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Pointer;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.PointerEvent;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValueVisitor;
+import com.badlogic.gdx.automation.recorder.InputProperty.AsyncProperty;
+import com.badlogic.gdx.automation.recorder.InputProperty.AsyncProperty.PlaceholderText;
+import com.badlogic.gdx.automation.recorder.InputProperty.AsyncProperty.Text;
+import com.badlogic.gdx.automation.recorder.InputProperty.AsyncPropertyVisitor;
+import com.badlogic.gdx.automation.recorder.InputProperty.StaticProperties;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.Accelerometer;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.Button;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.KeyEvent;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.KeyPressed;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.Orientation;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.Pointer;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.PointerEvent;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncPropertyVisitor;
+import com.badlogic.gdx.automation.recorder.RecordProperties;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.JsonWriter;
 import com.badlogic.gdx.utils.JsonWriter.OutputType;
@@ -51,8 +52,8 @@ public class JsonInputRecordWriter extends JsonInputRecord implements
 	}
 
 	@Override
-	public void writeStaticValues(StaticValues values) throws IOException {
-		Writer staticFileWriter = staticValuesFile.writer(false);
+	public void writeStaticValues(StaticProperties values) throws IOException {
+		Writer staticFileWriter = staticPropertiesFile.writer(false);
 		JsonWriter writer = new JsonWriter(staticFileWriter);
 		writer.setOutputType(OutputType.minimal);
 
@@ -69,11 +70,11 @@ public class JsonInputRecordWriter extends JsonInputRecord implements
 	}
 
 	@Override
-	public void writeSyncValues(SyncValue values) {
+	public void writeSyncValues(SyncProperty values) {
 		values.accept(syncHandler);
 	}
 
-	private class SyncValuesHandler implements SyncValueVisitor {
+	private class SyncValuesHandler implements SyncPropertyVisitor {
 
 		@Override
 		public void visitAccelerometer(Accelerometer accelerometer) {
@@ -197,11 +198,11 @@ public class JsonInputRecordWriter extends JsonInputRecord implements
 	}
 
 	@Override
-	public void writeAsyncValues(AsyncValue values) {
+	public void writeAsyncValues(AsyncProperty values) {
 		values.accept(asyncHandler);
 	}
 
-	private class AsyncValuesHandler implements AsyncValueVisitor {
+	private class AsyncValuesHandler implements AsyncPropertyVisitor {
 
 		@Override
 		public void visitText(Text text) {
@@ -242,8 +243,8 @@ public class JsonInputRecordWriter extends JsonInputRecord implements
 	@Override
 	public void open() throws IOException {
 		close();
-		syncFileWriter = syncValuesFile.writer(false);
-		asyncFileWriter = asyncValuesFile.writer(false);
+		syncFileWriter = syncPropertiesFile.writer(false);
+		asyncFileWriter = asyncPropertiesFile.writer(false);
 
 		syncJsonWriter = new JsonWriter(syncFileWriter);
 		asyncJsonWriter = new JsonWriter(asyncFileWriter);
@@ -253,5 +254,18 @@ public class JsonInputRecordWriter extends JsonInputRecord implements
 
 		syncJsonWriter.array();
 		asyncJsonWriter.array();
+	}
+
+	@Override
+	public void writeRecordProperties(RecordProperties properties)
+			throws IOException {
+		Writer propertiesWriter = recordPropertiesFile.writer(false);
+		JsonWriter writer = new JsonWriter(propertiesWriter);
+		writer.setOutputType(OutputType.minimal);
+
+		writer.object();
+		writer.set("absouluteCoords", properties.absouluteCoords);
+
+		writer.close();
 	}
 }

@@ -6,10 +6,10 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.automation.recorder.EventBufferAccessHelper.KeyEvent;
 import com.badlogic.gdx.automation.recorder.EventBufferAccessHelper.PointerEvent;
-import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.PlaceholderText;
-import com.badlogic.gdx.automation.recorder.InputValue.AsyncValue.Text;
-import com.badlogic.gdx.automation.recorder.InputValue.StaticValues;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue;
+import com.badlogic.gdx.automation.recorder.InputProperty.AsyncProperty.PlaceholderText;
+import com.badlogic.gdx.automation.recorder.InputProperty.AsyncProperty.Text;
+import com.badlogic.gdx.automation.recorder.InputProperty.StaticProperties;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty;
 
 /**
  * A simple implementation of the {@link Input} interface, designed to simply
@@ -21,7 +21,7 @@ class PlaybackInput extends InputProxy {
 
 	private final Iterator<Text> textIterator;
 	private final Iterator<PlaceholderText> placeholderTextIterator;
-	private final StaticValues features;
+	private final StaticProperties features;
 
 	private InputProcessor processor = null;
 	private final InputState state;
@@ -29,7 +29,7 @@ class PlaybackInput extends InputProxy {
 
 	public PlaybackInput(Iterator<Text> textIterator,
 			Iterator<PlaceholderText> placeholderTextIterator,
-			StaticValues features) {
+			StaticProperties features) {
 		state = new InputState(20);
 		this.textIterator = textIterator;
 		this.placeholderTextIterator = placeholderTextIterator;
@@ -283,7 +283,7 @@ class PlaybackInput extends InputProxy {
 				int len = state.pointerEvents.size();
 				for (int i = 0; i < len; i++) {
 					PointerEvent e = state.pointerEvents.get(i);
-					if (e.type == SyncValue.PointerEvent.Type.TOUCH_DOWN) {
+					if (e.type == SyncProperty.PointerEvent.Type.TOUCH_DOWN) {
 						state.justTouched = true;
 					}
 				}

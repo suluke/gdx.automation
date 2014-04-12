@@ -9,16 +9,16 @@ import java.util.Map;
 import com.badlogic.gdx.Application.ApplicationType;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Accelerometer;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Button;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.KeyEvent;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.KeyPressed;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Orientation;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Pointer;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.PointerEvent;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValue.Type;
-import com.badlogic.gdx.automation.recorder.InputValue.SyncValueVisitor;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.Accelerometer;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.Button;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.KeyEvent;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.KeyPressed;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.Orientation;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.Pointer;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.PointerEvent;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.Type;
+import com.badlogic.gdx.automation.recorder.InputProperty.SyncPropertyVisitor;
 import com.badlogic.gdx.utils.TimeUtils;
 
 /**
@@ -175,7 +175,7 @@ public class InputState {
 	}
 
 	/**
-	 * Use OR'ed {@link InputValue.Type#key}s to define properties
+	 * Use OR'ed {@link InputProperty.Type#key}s to define properties
 	 * 
 	 * @param input
 	 * @param properties
@@ -186,26 +186,26 @@ public class InputState {
 	public void set(Input input, int properties, boolean updateEvents) {
 		timeStamp = TimeUtils.millis(); // input in milliseconds should be
 										// sufficient
-		if ((InputValue.SyncValue.Type.POINTERS.key & properties) != 0) {
+		if ((InputProperty.SyncProperty.Type.POINTERS.key & properties) != 0) {
 			setX(input);
 			setY(input);
 			setDeltaX(input);
 			setDeltaY(input);
 			setTouched(input);
 		}
-		if ((InputValue.SyncValue.Type.BUTTONS.key & properties) != 0) {
+		if ((InputProperty.SyncProperty.Type.BUTTONS.key & properties) != 0) {
 			setButtons(input);
 		}
-		if ((InputValue.SyncValue.Type.KEYS_PRESSED.key & properties) != 0) {
+		if ((InputProperty.SyncProperty.Type.KEYS_PRESSED.key & properties) != 0) {
 			setPressedKeys(input);
 		}
-		if ((InputValue.SyncValue.Type.KEY_EVENTS.key & properties) != 0) {
+		if ((InputProperty.SyncProperty.Type.KEY_EVENTS.key & properties) != 0) {
 			setKeyEvents(input, updateEvents);
 		}
-		if ((InputValue.SyncValue.Type.POINTER_EVENTS.key & properties) != 0) {
+		if ((InputProperty.SyncProperty.Type.POINTER_EVENTS.key & properties) != 0) {
 			setPointerEvents(input, updateEvents);
 		}
-		if ((InputValue.SyncValue.Type.ORIENTATION.key & properties) != 0) {
+		if ((InputProperty.SyncProperty.Type.ORIENTATION.key & properties) != 0) {
 			setOrientation(input);
 		}
 	}
@@ -449,11 +449,11 @@ public class InputState {
 		return MAX_POINTERS;
 	}
 
-	public void apply(SyncValue syncValue) {
+	public void apply(SyncProperty syncValue) {
 		syncValue.accept(applier);
 	}
 
-	private class SyncValueApplier implements SyncValueVisitor {
+	private class SyncValueApplier implements SyncPropertyVisitor {
 		@Override
 		public void visitAccelerometer(Accelerometer accelerometer) {
 			accelerometerX = accelerometer.accelerometerX;
