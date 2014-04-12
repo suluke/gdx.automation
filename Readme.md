@@ -22,8 +22,8 @@ Below I explain what can already be achieved with the project, and in the "Futur
 * recorded input legible for both poll- and event-based applications  
   ([RemoteSender](https://github.com/libgdx/libgdx/blob/master/gdx/src/com/badlogic/gdx/input/RemoteSender.java) only supports input retrieved via InputProcessors)
 * offering means to record and playback input with just 3 additional lines of code, see below
-* replacing android's monkeyrunner already, platform independently and in the language you already work with!
-* easy to replace monkey tool, too. (currently TODO, see `RandomInputRecordReader`)
+* alternative to android's monkeyrunner, platform independently and in the language you already work with!
+* alternative to android's monkey tool, too. (currently TODO, see `RandomInputRecordReader`)
 * architecture supporting three types of input, for easy extensibility: 
   1. static (e.g. which sensors are supported)
   2. synchronous (propagated in main loop, e.g. touch events)
@@ -60,17 +60,20 @@ See the demos folder and the eclipse project within for code in action:
 
 ## Future development
 * ~~get recording to work with simple writer/ output format~~ CHECK!
-* implement `InputPlayer`
+* ~~implement `InputPlayer`~~ CHECK!
 * use less reflection. Use real backends with real access to platform specific code.
-* comply with libGdx' style guidelines
-* implement possibility to respond to certain inputs while recording
-  * enables writing a gui or something with hotkeys to start/pause/resume/stop recording
+* comply with libGdx' style guidelines (Collections)
 * `InputCombinator`: implement a player supporting to mix the recorded input with the actual input
   * e.g. specify regions that still listen to current device events, so an onscreen button can stop a playback.
     This would be great for tutorials.
 * implement callbacks during playback
   * ~~on replay finished, so e.g. a tutorial will automatically be replayed~~ CHECK!
 * `RandomInputRecordReader`: implement an android-style monkey tool
+* implement `InputBuilder`, a way to generate input sequences programmatically
+* `gradle`ize project (no jars in repository)
+* write tests, lots of
+* write `Actor`s to make it easy to realize tutorials
+* implement network reader and writer to replace [`RemoteInput`](https://github.com/libgdx/libgdx/blob/master/gdx/src/com/badlogic/gdx/input/RemoteInput.java) and [`RemoteSender`](https://github.com/libgdx/libgdx/blob/master/gdx/src/com/badlogic/gdx/input/RemoteSender.java)
 
 ## Contributing
 I would be happy to receive any pull requests with improvements.
