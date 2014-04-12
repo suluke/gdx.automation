@@ -94,6 +94,7 @@ class InputStateProcessor {
 					recorder.getConfiguration().recordedPointerCount);
 		}
 		lastState.set(state, copiedValuesFlag);
+		lastState.timeStamp = state.timeStamp;
 	}
 
 	private void processButtons(InputState state) throws IOException {

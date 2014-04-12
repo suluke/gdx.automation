@@ -17,7 +17,7 @@ public interface PlaybackListener {
 	 * {@link InputRecordReader}, indicating that there are no synchronous
 	 * events to be played back left.
 	 */
-	void onSynchronousFinish();
+	void onSyncPropertiesFinish();
 
 	void onStop();
 }

@@ -105,9 +105,14 @@ public class InputPlayer {
 	}
 
 	private void notifyFinished() {
-		for (PlaybackListener listener : listeners) {
-			listener.onSynchronousFinish();
-		}
+		Gdx.app.postRunnable(new Runnable() {
+			@Override
+			public void run() {
+				for (PlaybackListener listener : listeners) {
+					listener.onSyncPropertiesFinish();
+				}
+			}
+		});
 	}
 
 	/**

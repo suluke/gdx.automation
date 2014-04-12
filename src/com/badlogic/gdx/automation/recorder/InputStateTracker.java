@@ -257,6 +257,7 @@ class InputStateTracker {
 					processorThread.interrupt();
 					try {
 						processorThread.join();
+						processor.reset();
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}

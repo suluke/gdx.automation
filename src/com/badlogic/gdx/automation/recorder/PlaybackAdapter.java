@@ -15,7 +15,7 @@ public class PlaybackAdapter implements PlaybackListener {
 	}
 
 	@Override
-	public void onSynchronousFinish() {
+	public void onSyncPropertiesFinish() {
 	}
 
 	@Override
