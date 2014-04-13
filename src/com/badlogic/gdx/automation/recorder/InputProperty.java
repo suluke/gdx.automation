@@ -1,8 +1,10 @@
 package com.badlogic.gdx.automation.recorder;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Orientation;
 import com.badlogic.gdx.Input.Peripheral;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.automation.recorder.InputProperty.AsyncProperty.PlaceholderText;
 import com.badlogic.gdx.automation.recorder.InputProperty.AsyncProperty.Text;
 import com.badlogic.gdx.automation.recorder.InputProperty.SyncProperty.Accelerometer;
@@ -25,6 +27,10 @@ public abstract class InputProperty {
 	}
 
 	/**
+	 * Base class of all input values that are directly passed to the program.
+	 * This includes input events that are usually received using
+	 * {@link InputProcessor}, since the processing of them also happens in the
+	 * main thread.
 	 * 
 	 * @author Lukas Böhm
 	 * 
@@ -73,6 +79,7 @@ public abstract class InputProperty {
 		public long timeDelta;
 
 		/**
+		 * A struct to store the three axis values of the accelerometer in.
 		 * 
 		 * @author Lukas Böhm
 		 * 
@@ -89,6 +96,9 @@ public abstract class InputProperty {
 		}
 
 		/**
+		 * A struct storing all information there is regarding a device's
+		 * orientation. This includes the three gyroscope values as well as the
+		 * screen orientation and the orientation matrix.
 		 * 
 		 * @author Lukas Böhm
 		 * 
@@ -108,11 +118,19 @@ public abstract class InputProperty {
 		}
 
 		/**
+		 * A class indicating that a key was either pressed or has stopped being
+		 * pressed.
 		 * 
 		 * @author Lukas Böhm
 		 * 
 		 */
 		public static class KeyPressed extends SyncProperty {
+			/**
+			 * Describes whether a key press has begun or finished.
+			 * 
+			 * @author Lukas Böhm
+			 * 
+			 */
 			public enum Type {
 				PRESS, RELEASE
 			}
@@ -128,11 +146,20 @@ public abstract class InputProperty {
 		}
 
 		/**
+		 * Similar to {@link KeyPressed}, but closer to the high-level key
+		 * events of the platforms libGdx targets.
 		 * 
 		 * @author Lukas Böhm
 		 * 
 		 */
 		public static class KeyEvent extends SyncProperty {
+			/**
+			 * Description of the exact KeyEvent type, as libGdx' target
+			 * platform events use them.
+			 * 
+			 * @author Lukas Böhm
+			 * 
+			 */
 			public enum Type {
 				KEY_DOWN, KEY_UP, KEY_TYPED;
 				static Type mapAndroid(int i) {
@@ -177,11 +204,20 @@ public abstract class InputProperty {
 		}
 
 		/**
+		 * Event whose implementation closely resembles the platform specific
+		 * mouse events of libGdx' target platforms.
 		 * 
 		 * @author Lukas Böhm
 		 * 
 		 */
 		public static class PointerEvent extends SyncProperty {
+			/**
+			 * Superset of all types of pointer events (called "touch" in
+			 * libGdx) that the different target platforms involve.
+			 * 
+			 * @author Lukas Böhm
+			 * 
+			 */
 			public enum Type {
 				TOUCH_DOWN, TOUCH_UP, TOUCH_DRAGGED, TOUCH_SCROLLED, TOUCH_MOVED;
 				static Type mapAndroid(int i) {
@@ -245,6 +281,9 @@ public abstract class InputProperty {
 		}
 
 		/**
+		 * A class to aggregate all position information that is emitted by the
+		 * use of a single touch pointer or mouse, not considering buttons or
+		 * touch states.
 		 * 
 		 * @author Lukas Böhm
 		 * 
@@ -263,6 +302,7 @@ public abstract class InputProperty {
 		}
 
 		/**
+		 * Class to store the state of the three possible buttons of a mouse.
 		 * 
 		 * @author Lukas Böhm
 		 * 
@@ -306,6 +346,9 @@ public abstract class InputProperty {
 	}
 
 	/**
+	 * Abstract class parenting all classes of input, which can not be read
+	 * directly from {@link Input Gdx.input} but instead are supplied to the
+	 * program using specified callbacks.
 	 * 
 	 * @author Lukas Böhm
 	 * 
@@ -322,6 +365,15 @@ public abstract class InputProperty {
 		 */
 		public abstract void accept(AsyncPropertyVisitor visitor);
 
+		/**
+		 * Description of the outcome of a
+		 * {@link Input#getTextInput(com.badlogic.gdx.Input.TextInputListener, String, String)
+		 * getText} request. If the outcome is null it means that the request
+		 * was canceled.
+		 * 
+		 * @author Lukas Böhm
+		 * 
+		 */
 		public static class Text extends AsyncProperty {
 			public Text(String text) {
 				input = text;
@@ -339,6 +391,15 @@ public abstract class InputProperty {
 			}
 		}
 
+		/**
+		 * Description of the outcome of a
+		 * {@link Input#getPlaceholderTextInput(com.badlogic.gdx.Input.TextInputListener, String, String)
+		 * getPlaceholderText} request. If the outcome is null it means that the
+		 * request was canceled.
+		 * 
+		 * @author Lukas Böhm
+		 * 
+		 */
 		public static class PlaceholderText extends AsyncProperty {
 			public PlaceholderText(String text) {
 				input = text;
