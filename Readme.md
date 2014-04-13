@@ -62,7 +62,7 @@ public T myMethod(...) { // wherever you want to playback
 	player.startPlayback();
 }
 ```
-Consult the [class documentation]() to get an overview of how the api looks like.  
+Consult the [class documentation](http://suluke.github.io/gdx.automation) to get an overview of how the api looks like.  
 OR: See the demos folder and the eclipse project within for code in action:
 * `com.badlogic.demos.automation.simple`: Simple application to visualize input while recrding it with the ability to play it back
 
